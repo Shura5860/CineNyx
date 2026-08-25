@@ -1,0 +1,187 @@
+<div class="admin-movies-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Film Yönetimi</h1>
+      <p class="page-subtitle">Filmleri görüntüleyin, ekleyin veya silin</p>
+    </div>
+    <div class="header-actions">
+      <button pButton label="Yeni Film Ekle" icon="pi pi-plus" class="p-button-primary" (click)="openNew()">
+      </button>
+      <button *ngIf="selectedMovies.length > 0" pButton label="Seçilenleri Sil" icon="pi pi-trash"
+        class="p-button-danger" (click)="deleteSelectedMovies()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Film Tablosu -->
+  <p-card>
+    <p-table [value]="filteredMovies" [paginator]="true" [rows]="itemsPerPage" [rowsPerPageOptions]="[10, 25, 50]"
+      [first]="first" (page)="onPageChange($event)" [globalFilterFields]="['title', 'genre']"
+      [tableStyle]="{'min-width': '50rem'}" styleClass="p-datatable-striped" [loading]="false" selectionMode="multiple"
+      [(selection)]="selectedMovies" dataKey="_id">
+
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Film ara..." />
+          </span>
+          <p-select [options]="sortOptions" [(ngModel)]="sortOption" (onChange)="onSortChange()"
+            placeholder="İstatistiğe göre sırala" [showClear]="true" class="sort-dropdown">
+          </p-select>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th style="width: 80px">Poster</th>
+          <th>Başlık</th>
+          <th style="width: 80px">Yıl</th>
+          <th style="width: 120px">Tür</th>
+          <th style="width: 100px">Durum</th>
+          <th style="width: 120px">Toplam İzlenme</th>
+          <th style="width: 100px">Beğenme</th>
+          <th style="width: 100px">Beğenmeme</th>
+          <th style="width: 100px">Dosya İşlemleri</th>
+          <th style="width: 120px">İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-movie>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="movie"></p-tableCheckbox>
+          </td>
+          <td>
+            <img [src]="movie.imagePath || movie.poster" [alt]="movie.title" class="table-poster"
+              (error)="$event.target.src=''" />
+          </td>
+          <td>
+            <strong>{{ movie.title }}</strong>
+          </td>
+          <td>{{ getYear(movie.releaseDate) }}</td>
+          <td>
+            <span *ngIf="!movie.categories?.length">-</span>
+            <span *ngFor="let genre of movie.categories" class="genre-badge-wrap">
+              <p-tag [value]="genre.name" [severity]="getSeverity(genre.name)"></p-tag>
+            </span>
+          </td>
+          <td>
+            <span *ngIf="movie.movieStatus == 0" class="genre-badge-wrap">
+              <p-tag [value]="'Film Oluşturuldu Ama İçerik Yüklenmedi'" severity="warn" [rounded]="true"></p-tag>
+            </span>
+
+            <span *ngIf="movie.movieStatus == 1" class="genre-badge-wrap">
+              <p-tag [value]="'İçerik Yüklendi Ama Yayında Değil'" severity="info" [rounded]="true"></p-tag>
+            </span>
+
+            <span *ngIf="movie.movieStatus == 2" class="genre-badge-wrap">
+              <p-tag [value]="'Yayında'" severity="success" [rounded]="true"></p-tag>
+            </span>
+          </td>
+          <td>
+            <span class="stat-value">{{ formatNumber(movie.watchCount ?? 0) }}</span>
+          </td>
+          <td>
+            <span class="stat-value positive">{{ formatNumber(movie.likeCount ?? 0) }}</span>
+          </td>
+          <td>
+            <span class="stat-value negative">{{ formatNumber(movie.dislikeCount ?? 0) }}</span>
+          </td>
+          <td>
+            <div class="card flex justify-center">
+              <p-button label="Dosya Yöneticisini Aç" (onClick)="openFileManager(movie)"/>
+            </div>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+                (click)="editMovie(movie)" pTooltip="Düzenle">
+              </button>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                (click)="deleteMovie(movie)" pTooltip="Sil">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="11">
+            <div class="empty-state">
+              <i class="pi pi-film"></i>
+              <p>Henüz film eklenmemiş</p>
+              <button pButton label="İlk Filmi Ekle" icon="pi pi-plus" class="p-button-primary" (click)="openNew()">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Film Ekleme/Düzenleme Dialog -->
+  <p-dialog [(visible)]="displayDialog" [header]="editingMovie ? 'Film Düzenle' : 'Yeni Film Ekle'" [modal]="true"
+    [style]="{width: '500px'}" [draggable]="false" [resizable]="false">
+
+    <!-- DÜZENLEME MODU -->
+    <div *ngIf="editingMovie" class="dialog-content">
+      <div class="form-group">
+        <label for="editTitle">Başlık *</label>
+        <input id="editTitle" type="text" pInputText [(ngModel)]="newMovie.title" placeholder="Film adı" class="w-full" />
+      </div>
+      <div class="form-group">
+        <label for="editDesc">Açıklama</label>
+        <textarea id="editDesc" pInputText [(ngModel)]="newMovie.description" placeholder="Film açıklaması" class="w-full" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="editShortDesc">Kısa Açıklama</label>
+        <input id="editShortDesc" type="text" pInputText [(ngModel)]="newMovie.shortDescription" placeholder="Kısa açıklama" class="w-full" />
+      </div>
+      <div class="form-group">
+        <label for="editImdb">IMDB Puanı</label>
+        <p-inputNumber id="editImdb" [(ngModel)]="newMovie.imdbScore" [min]="0" [max]="10" [minFractionDigits]="1" [maxFractionDigits]="1" class="w-full"></p-inputNumber>
+      </div>
+      <div class="form-group">
+        <label for="editQuality">Maksimum Kalite</label>
+        <p-select id="editQuality" [options]="[{label: 'SD', value: 'SD'}, {label: 'HD', value: 'HD'}, {label: 'Full HD', value: 'FullHD'}, {label: '4K', value: '4K'}]" [(ngModel)]="newMovie.maxQuality" placeholder="Kalite seçin" class="w-full"></p-select>
+      </div>
+      <div class="flex justify-end gap-2 mt-3">
+        <p-button label="İptal" icon="pi pi-times" styleClass="p-button-text" (onClick)="displayDialog = false" />
+        <p-button label="Kaydet" icon="pi pi-check" (onClick)="saveMovie()" />
+      </div>
+    </div>
+
+    <!-- YENİ EKLEME MODU -->
+    <div *ngIf="!editingMovie" class="dialog-content">
+      <div class="form-group">
+        <label for="title">Film İsmi *</label>
+        <input id="title" type="text" pInputText [(ngModel)]="newMovie.title" placeholder="Film adını girin"
+          class="w-full" />
+      </div>
+      <p-button label="Filmi Ara" icon="pi pi-search" (click)="searchMovie()" />
+    </div>
+
+    <div *ngIf="!editingMovie && newMovie.searchResults && newMovie.searchResults.length > 0" class="movies-card-list">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xl font-bold">Filmler</span>
+        <span>Toplam {{ newMovie.searchResults.length }} film bulundu.</span>
+      </div>
+      <div class="movie-cards-grid">
+        <div *ngFor="let movie of newMovie.searchResults" class="movie-card cursor-pointer hover:shadow-lg transition"
+          (click)="selectMovie(movie)">
+          <img [src]="movie.poster" [alt]="movie.title" class="movie-card-poster rounded mb-2"
+            style="object-fit:cover;width:100%;height:220px;" />
+          <div class="movie-card-title" [title]="movie.title">{{ movie.title }}</div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+</div>

@@ -1,0 +1,130 @@
+<div class="movies-container">
+  <!-- Modern Background Gradient -->
+  <div class="background-gradient"></div>
+
+  <!-- Header Section -->
+  <div class="movies-header">
+    <div class="header-content">
+      <h1 class="page-title">Filmler</h1>
+      <p class="page-subtitle">En popüler ve yeni çıkan filmleri keşfedin</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="movies-content">
+    <!-- Search and Filters Section -->
+    <div class="filters-section">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          placeholder="Film ara..."
+          class="search-input"
+        />
+      </div>
+
+      <!-- Genre Filters -->
+      <div class="genre-filters">
+        <button
+          *ngFor="let genre of genres"
+          [class.active]="selectedGenre === genre.value"
+          (click)="selectedGenre = genre.value; onGenreChange()"
+          class="genre-btn"
+        >
+          {{ genre.label }}
+        </button>
+      </div>
+
+      <!-- Advanced Filters -->
+      <div class="advanced-filters">
+        <div class="filter-group">
+          <label>Yıl</label>
+          <select 
+            [(ngModel)]="selectedYear" 
+            (change)="onYearChange()"
+            class="filter-select"
+          >
+            <option [value]="null">Tüm Yıllar</option>
+            <option *ngFor="let year of years" [value]="year.value">{{ year.label }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>IMDB Puanı</label>
+          <select 
+            [(ngModel)]="selectedRating" 
+            (change)="onRatingChange()"
+            class="filter-select"
+          >
+            <option *ngFor="let rating of ratings" [value]="rating.value">{{ rating.label }}</option>
+          </select>
+        </div>
+
+        <button 
+          class="clear-filters-btn"
+          (click)="clearFilters()"
+          *ngIf="selectedGenre !== 'all' || selectedYear || selectedRating || searchQuery"
+        >
+          <i class="pi pi-times"></i>
+          Filtreleri Temizle
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info">
+      <span class="results-count">{{ filteredMovies.length }} film bulundu</span>
+    </div>
+
+    <!-- Movies Grid -->
+    <div class="movies-grid-container">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Filmler yükleniyor...</p>
+      </div>
+
+      <div class="movies-grid" *ngIf="!loading && filteredMovies.length > 0">
+        <div
+          *ngFor="let movie of filteredMovies"
+          class="movie-card"
+          [routerLink]="['/film', movie.id]"
+        >
+          <div class="movie-poster-wrapper">
+            <img [src]="movie.poster" [alt]="movie.title" class="movie-poster" (error)="$any($event.target).src=''" />
+            <div class="movie-overlay">
+              <div class="movie-rating-badge">
+                <i class="pi pi-star"></i>
+                <span>{{ movie.rating.toFixed(1) }}</span>
+              </div>
+              <button class="play-btn">
+                <i class="pi pi-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="movie-info">
+            <h3 class="movie-title">{{ movie.title }}</h3>
+            <div class="movie-meta">
+              <span class="movie-year" *ngIf="movie.year">{{ movie.year }}</span>
+              <span class="movie-genre" *ngIf="movie.genre && movie.genre !== 'all'">{{ movie.genre }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && filteredMovies.length === 0">
+        <i class="pi pi-film empty-icon"></i>
+        <h3>Film bulunamadı</h3>
+        <p>Aradığınız kriterlere uygun film bulunamadı. Filtreleri değiştirmeyi deneyin.</p>
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Filtreleri Temizle
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

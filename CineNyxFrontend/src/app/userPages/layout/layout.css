@@ -1,0 +1,674 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+.layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* NAVBAR SCROLL ANIMATION */
+.navbar {
+    position: sticky;
+    top: 24px;
+    z-index: 1002;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(0);
+    background: transparent;
+    padding-top: 0;
+}
+
+.navbar.navbar-hidden {
+    transform: translateY(-100%);
+}
+
+/* NAVBAR İÇERİK KONUMLANDIRMA */
+::ng-deep .navbar.card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+::ng-deep .navbar .p-menubar {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0.75rem 2rem;
+    position: relative;
+    z-index: 1001;
+    background: rgba(10, 10, 11, 0.75) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(229, 9, 20, 0.25);
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(229, 9, 20, 0.2), 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] ::ng-deep .navbar .p-menubar {
+    background: rgba(245, 245, 247, 0.75) !important;
+}
+
+::ng-deep .navbar .p-menubar * {
+    pointer-events: auto;
+}
+
+::ng-deep .navbar .p-menubar-start {
+    padding-right: 3rem;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+}
+
+/* Navbar Logo */
+.logo-link {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none;
+    overflow: visible;
+    margin-right: 2.5rem;
+}
+
+.logo-link:hover {
+    transform: scale(1.05);
+}
+
+/* Logo: küçük yer kaplar (navbar büyümez), scale ile büyük görünür */
+.logo-link .logo-img,
+.logo-link svg {
+    display: block;
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    transition: filter 0.3s ease;
+    transform: scale(2.5);
+    transform-origin: left center;
+}
+
+.logo-link:hover .logo-img,
+.logo-link:hover svg {
+    filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.5));
+}
+
+::ng-deep .navbar .p-menubar-end {
+    padding-left: 3rem;
+}
+
+/* Menü listesi padding */
+::ng-deep .navbar .p-menubar .p-menubar-root-list {
+    gap: 0.5rem;
+    margin-left: 2rem;
+}
+
+/* Menü item active state */
+::ng-deep .navbar .p-menubar .p-menubar-root-list > .p-menubar-item > a.active,
+::ng-deep .navbar .p-menubar .p-menubar-root-list > .p-menubar-item > a.router-link-active {
+    color: var(--primary-color) !important;
+    background: rgba(229, 9, 20, 0.1) !important;
+    border-radius: 8px;
+}
+
+.content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.footer {
+    padding: 3rem 3rem 1.5rem;
+    background: linear-gradient(180deg, rgba(10, 10, 11, 0.95) 0%, rgba(10, 10, 11, 1) 100%);
+    color: var(--text-color);
+    border-top: 1px solid rgba(229, 9, 20, 0.2);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1.5fr;
+    gap: 3rem;
+    align-items: flex-start;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.footer-logo-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-logo-link:hover {
+    transform: scale(1.08);
+    background: rgba(229, 9, 20, 0.1);
+    border-color: rgba(229, 9, 20, 0.3);
+    box-shadow: 0 4px 16px rgba(229, 9, 20, 0.2);
+}
+
+.footer-logo-img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(1.2) contrast(1.1);
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.footer-logo-link:hover .footer-logo-img {
+    filter: brightness(1.3) contrast(1.2) drop-shadow(0 0 12px rgba(229, 9, 20, 0.6));
+}
+
+.desc {
+    font-size: 0.9rem;
+    color: var(--text-color-secondary);
+    margin-top: 0.5rem;
+    line-height: 1.6;
+    max-width: 400px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.footer-links-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.footer-column-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0 0 0.5rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-links-column a {
+    color: var(--text-color-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0;
+}
+
+.footer-links-column a:hover {
+    color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.social-section {
+    width: 100%;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color-secondary);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.social-link:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+}
+
+.copyright {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+}
+
+.copyright p {
+    margin: 0.25rem 0;
+}
+
+.copyright-note {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.5rem !important;
+}
+
+/* Responsive Footer */
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .right {
+        grid-column: 1 / -1;
+        align-items: center;
+    }
+    
+    .social-section {
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 2rem 1.5rem 1rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .center {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .desc {
+        max-width: 100%;
+    }
+}
+
+/* SEARCH CONTAINER */
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 40px;
+}
+
+.search-icon-btn {
+    position: absolute;
+    left: 12px;
+    z-index: 10;
+    background: transparent;
+    border: none;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    pointer-events: none;
+}
+
+.search-icon-btn i {
+    font-size: 1.1rem;
+}
+
+.search-input {
+    width: 40px !important;
+    height: 40px;
+    padding-left: 40px !important;
+    padding-right: 12px !important;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
+    cursor: pointer;
+}
+
+.search-input::placeholder {
+    color: var(--text-color-secondary);
+    opacity: 0.6;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+}
+
+/* Hover efekti */
+.search-container:hover .search-input,
+.search-input:focus {
+    width: 280px !important;
+    opacity: 1;
+    cursor: text;
+}
+
+.search-container:hover .search-icon-btn {
+    color: var(--primary-color);
+}
+
+.search-input:focus ~ .search-icon-btn {
+    color: var(--primary-color);
+}
+
+/* PrimeNG override */
+::ng-deep .search-input.p-inputtext {
+    width: 40px !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+::ng-deep .search-container:hover .search-input.p-inputtext,
+::ng-deep .search-input.p-inputtext:focus {
+    width: 280px !important;
+}
+
+/* KAYIT OL / GİRİŞ YAP BUTONU */
+.auth-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.auth-btn:hover {
+    background: rgba(229, 9, 20, 0.9);
+    border-color: rgba(229, 9, 20, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+}
+
+.auth-btn:active {
+    transform: translateY(0);
+}
+
+/* ARAMA ROBOTU DROPDOWN */
+.search-robot-container {
+    position: relative;
+}
+
+.search-robot-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.search-robot-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+.search-robot-trigger i {
+    font-size: 1rem;
+}
+
+.search-robot-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 380px;
+    background: var(--surface-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.search-robot-container.open .search-robot-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.search-robot-hint {
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.filter-row label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.filter-dropdown {
+    width: 100%;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-btn,
+.reset-btn {
+    flex: 1;
+    padding: 0.75rem !important;
+    font-weight: 600;
+}
+
+.search-btn {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.reset-btn {
+    background: transparent !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: var(--text-color) !important;
+}
+
+.reset-btn:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* PrimeNG Select override */
+::ng-deep .filter-dropdown .p-select,
+::ng-deep .filter-dropdown {
+    width: 100%;
+}
+
+::ng-deep .filter-dropdown .p-select-wrapper {
+    width: 100%;
+}
+
+::ng-deep .filter-dropdown .p-select-trigger {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+::ng-deep .filter-dropdown .p-select-trigger:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+::ng-deep .filter-dropdown .p-select-trigger.p-focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+}
+
+/* PROFİL MENÜSÜ */
+.profile-container {
+    position: relative;
+}
+
+.profile-avatar {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-avatar:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+/* Boş avatar için stil */
+::ng-deep .profile-avatar .p-avatar-label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.profile-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 280px;
+    background: var(--surface-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+    pointer-events: none;
+    padding: 0;
+}
+
+.profile-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.profile-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.profile-email {
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+}
+
+.profile-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.5rem 0;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.profile-menu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-menu-item i {
+    font-size: 1rem;
+    color: var(--text-color-secondary);
+    width: 20px;
+    text-align: center;
+}
+
+.profile-menu-item.logout {
+    color: #ff5050;
+}
+
+.profile-menu-item.logout:hover {
+    background: rgba(255, 80, 80, 0.1);
+}
+
+.profile-menu-item.logout i {
+    color: #ff5050;
+}
+
+/* PrimeNG OverlayPanel override */
+::ng-deep .p-overlaypanel {
+    background: var(--surface-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    padding: 0;
+}
+
+::ng-deep .p-overlaypanel::before {
+    border-bottom-color: var(--surface-card);
+}
+
+::ng-deep .p-overlaypanel::after {
+    border-bottom-color: var(--surface-card);
+}

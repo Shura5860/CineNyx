@@ -1,0 +1,342 @@
+<div class="register-container">
+  <!-- Header -->
+  <header class="register-header">
+    <div class="header-content">
+      <a routerLink="/" class="logo" aria-label="Anasayfa">
+        <img src="assets/images/logo.png" alt="Logo" class="logo-img" width="160" height="80" loading="eager" />
+      </a>
+      <div class="header-actions">
+        <a routerLink="/" class="help-link">Yardım</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="progress-section">
+    <div class="progress-info">
+      <span class="step-indicator">Adım {{ currentStep }}/{{ totalSteps }}</span>
+      <span class="step-title">{{ getStepTitle() }}</span>
+    </div>
+    <p-progressBar [value]="getProgress()" [showValue]="false" styleClass="custom-progressbar"></p-progressBar>
+  </div>
+
+  <!-- Main Content -->
+  <div class="register-content">
+    <!-- Adım 1: Hesap Bilgileri -->
+    <div *ngIf="currentStep === 1" class="step-content">
+      <h1 class="main-title">Hesap Oluştur</h1>
+      <p class="subtitle">Favori filmlerinizi izlemek için bilgilerinizi girin.</p>
+
+      <form class="register-form" (ngSubmit)="nextStep()">
+        <div class="form-group">
+          <label for="fullName">Ad Soyad</label>
+          <div class="input-wrapper">
+            <i class="pi pi-user input-icon"></i>
+            <input
+              id="fullName"
+              type="text"
+              pInputText
+              [(ngModel)]="formData.fullName"
+              name="fullName"
+              placeholder="Adınız ve Soyadınız"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-posta Adresi</label>
+          <div class="input-wrapper">
+            <i class="pi pi-envelope input-icon"></i>
+            <input
+              id="email"
+              type="email"
+              pInputText
+              [(ngModel)]="formData.email"
+              name="email"
+              placeholder="ornek@email.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Şifre</label>
+          <div class="input-wrapper">
+            <i class="pi pi-lock input-icon"></i>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              pInputText
+              [(ngModel)]="formData.password"
+              name="password"
+              placeholder="Şifreniz"
+              required
+            />
+            <i 
+              class="pi"
+              [class.pi-eye]="!showPassword"
+              [class.pi-eye-slash]="showPassword"
+              class="input-icon-right"
+              (click)="togglePasswordVisibility()"
+              style="cursor: pointer;"
+            ></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Şifre Tekrar</label>
+          <div class="input-wrapper">
+            <i class="pi pi-lock input-icon"></i>
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              pInputText
+              [(ngModel)]="formData.confirmPassword"
+              name="confirmPassword"
+              placeholder="Şifrenizi tekrar girin"
+              required
+            />
+            <i 
+              class="pi"
+              [class.pi-eye]="!showConfirmPassword"
+              [class.pi-eye-slash]="showConfirmPassword"
+              class="input-icon-right"
+              (click)="toggleConfirmPasswordVisibility()"
+              style="cursor: pointer;"
+            ></i>
+          </div>
+        </div>
+
+        <div class="checkbox-group">
+          <p-checkbox
+            [(ngModel)]="formData.acceptTerms"
+            name="acceptTerms"
+            [binary]="true"
+            inputId="terms"
+          ></p-checkbox>
+          <label for="terms" class="checkbox-label" (click)="formData.acceptTerms = !formData.acceptTerms">
+            <span>Kullanım Şartları ve</span>
+            <a href="#" class="link" (click)="$event.preventDefault()">Gizlilik Politikası</a>
+            <span>'nı kabul ediyorum.</span>
+          </label>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="button"
+          pButton
+          label="Devam Et"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          class="continue-btn"
+          [disabled]="!canProceedStep1() || loading"
+          (click)="nextStep()"
+        ></button>
+      </form>
+    </div>
+
+    <!-- Adım 2: Beğendiğin Filmler -->
+    <div *ngIf="currentStep === 2" class="step-content step-2-content">
+      <h1 class="main-title step-2-title">Beğendiğin Filmler</h1>
+      <p class="subtitle step-2-subtitle">
+        Sana özel öneriler sunabilmemiz için en az 3 film seç.
+        <span class="selection-count">{{ selectedMovies.length }} seçildi</span>
+      </p>
+
+      <div class="search-section step-2-search">
+        <div class="search-bar">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQuery"
+            (input)="onSearchChange()"
+            placeholder="Film ara..."
+            class="search-input"
+          />
+        </div>
+        <div class="genre-filters step-2-filters">
+          <button
+            *ngFor="let genre of genres"
+            [class.active]="selectedGenre === genre.value"
+            (click)="selectedGenre = genre.value; onGenreChange()"
+            class="genre-btn"
+          >
+            {{ genre.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="movies-grid-container">
+        <div class="movies-grid">
+          <div
+            *ngFor="let movie of filteredMovies"
+            class="movie-card"
+            [class.selected]="isMovieSelected(movie.id)"
+            (click)="toggleMovie(movie.id)"
+          >
+            <img [src]="movie.poster" [alt]="movie.title" class="movie-poster" />
+            <div class="movie-info">
+              <h3 class="movie-title">{{ movie.title }}</h3>
+              <p class="movie-year">{{ movie.year }}</p>
+            </div>
+            <div *ngIf="isMovieSelected(movie.id)" class="checkmark">
+              <i class="pi pi-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div class="step-actions">
+        <button
+          type="button"
+          pButton
+          label="← Geri"
+          class="p-button-secondary back-btn"
+          (click)="previousStep()"
+        ></button>
+        <div class="action-buttons">
+          <button
+            type="button"
+            pButton
+            label="Atla"
+            class="p-button-secondary skip-btn"
+            (click)="skipStep2()"
+            [disabled]="loading"
+          ></button>
+          <button
+            type="button"
+            pButton
+            label="Devam Et"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            class="continue-btn"
+            [disabled]="loading || selectedMovies.length === 0"
+            (click)="nextStep()"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adım 3: Beğendiğin Diziler -->
+    <div *ngIf="currentStep === 3" class="step-content">
+      <h1 class="main-title">Beğendiğin Diziler</h1>
+      <p class="subtitle">
+        Sana özel öneriler sunabilmemiz için en az 3 dizi seç.
+        <span class="selection-count">{{ selectedTvShows.length }} seçildi</span>
+      </p>
+
+      <div class="search-section">
+        <div class="search-bar">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQueryStep3"
+            (input)="onTvSearchChange()"
+            placeholder="Dizi ara..."
+            class="search-input"
+          />
+        </div>
+        <div class="genre-filters">
+          <button
+            *ngFor="let genre of genres"
+            [class.active]="selectedGenreStep3 === genre.value"
+            (click)="selectedGenreStep3 = genre.value; onTvGenreChange()"
+            class="genre-btn"
+          >
+            {{ genre.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="movies-grid-container">
+        <button 
+          class="scroll-btn scroll-btn-left"
+          (click)="scrollMovies('left')"
+          aria-label="Önceki diziler"
+        >
+          <i class="pi pi-chevron-left"></i>
+        </button>
+        <div class="movies-grid-wrapper">
+          <div class="movies-grid">
+            <div
+              *ngFor="let show of filteredTvShows"
+              class="movie-card"
+              [class.selected]="isTvShowSelected(show.id)"
+              (click)="toggleTvShow(show.id)"
+            >
+              <img [src]="show.poster" [alt]="show.title" class="movie-poster" />
+              <div class="movie-info">
+                <h3 class="movie-title">{{ show.title }}</h3>
+                <p class="movie-year">{{ show.year }}</p>
+                <p class="movie-rating">☆ {{ show.rating }}</p>
+              </div>
+              <div *ngIf="isTvShowSelected(show.id)" class="checkmark">
+                <i class="pi pi-check"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button 
+          class="scroll-btn scroll-btn-right"
+          (click)="scrollMovies('right')"
+          aria-label="Sonraki diziler"
+        >
+          <i class="pi pi-chevron-right"></i>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        pButton
+        label="Daha Fazla Göster"
+        icon="pi pi-chevron-down"
+        iconPos="right"
+        class="p-button-secondary show-more-btn"
+      ></button>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div class="step-actions">
+        <button
+          type="button"
+          pButton
+          label="← Geri"
+          class="p-button-secondary back-btn"
+          (click)="previousStep()"
+        ></button>
+        <div class="action-buttons">
+          <button
+            type="button"
+            pButton
+            label="Atla"
+            class="p-button-secondary skip-btn"
+            (click)="skipStep3()"
+            [disabled]="loading"
+          ></button>
+          <button
+            type="button"
+            pButton
+            label="Kaydı Tamamla"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            class="complete-btn"
+            [disabled]="loading"
+            (click)="completeRegistration()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

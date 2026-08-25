@@ -1,0 +1,369 @@
+<div class="background-gradient"></div>
+<div class="profile-page">
+  <div class="profile-container">
+    <!-- Sol Sidebar -->
+    <aside class="profile-sidebar">
+      <!-- Kullanıcı Bilgileri -->
+      <div class="user-info">
+        <p-avatar 
+          [image]="currentUser?.profileImage || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'"
+          [label]="!currentUser?.profileImage ? (currentUser?.username?.[0] || '?') : undefined"
+          shape="circle" 
+          size="xlarge"
+          styleClass="user-avatar" />
+        <h2 class="username">{{ currentUser?.username || 'Kullanıcı' }}</h2>
+        <p class="user-handle">@{{ currentUser?.username?.toLowerCase() || 'kullanici' }}</p>
+        <button pButton label="Profili Düzenle" class="p-button-primary edit-profile-btn" (click)="setActiveTab('settings')"></button>
+      </div>
+
+      <!-- Aktivite İstatistikleri -->
+      <div class="activity-section">
+        <h3 class="section-title">AKTİVİTELERİN</h3>
+        <div class="activity-cards">
+          <div class="activity-card">
+            <i class="pi pi-film"></i>
+            <div>
+              <div class="activity-value">{{ stats.moviesWatched }}</div>
+              <div class="activity-label">İzlenen Film</div>
+            </div>
+          </div>
+          <div class="activity-card">
+            <i class="pi pi-clock"></i>
+            <div>
+              <div class="activity-value">{{ stats.hoursStreamed }}s</div>
+              <div class="activity-label">Saat İzlenen</div>
+            </div>
+          </div>
+          <div class="activity-card">
+            <i class="pi pi-star"></i>
+            <div>
+              <div class="activity-value">{{ stats.favoriteGenre }}</div>
+              <div class="activity-label">Favori Tür</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hesap Menüsü -->
+      <div class="account-menu">
+        <h3 class="section-title">HESAP</h3>
+        <nav class="account-nav">
+          <a 
+            class="nav-item" 
+            [class.active]="activeTab === 'overview'"
+            (click)="setActiveTab('overview')">
+            <i class="pi pi-user"></i>
+            <span>Genel Bakış</span>
+          </a>
+          <a 
+            class="nav-item" 
+            [class.active]="activeTab === 'settings'"
+            (click)="setActiveTab('settings')">
+            <i class="pi pi-cog"></i>
+            <span>Ayarlar</span>
+          </a>
+          <a 
+            class="nav-item" 
+            [class.active]="activeTab === 'subscription'"
+            (click)="setActiveTab('subscription')">
+            <i class="pi pi-credit-card"></i>
+            <span>Abonelik</span>
+          </a>
+          <a 
+            class="nav-item" 
+            [class.active]="activeTab === 'parental'"
+            (click)="setActiveTab('parental')">
+            <i class="pi pi-lock"></i>
+            <span>Ebeveyn Kontrolü</span>
+          </a>
+          <a class="nav-item logout" (click)="onLogout()">
+            <i class="pi pi-sign-out"></i>
+            <span>Çıkış Yap</span>
+          </a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Ana İçerik -->
+    <main class="profile-content">
+      <!-- Genel Bakış -->
+      <div *ngIf="activeTab === 'overview'" class="tab-content">
+        <div class="content-header">
+          <h1 class="page-title">Kütüphanem</h1>
+          <p class="page-subtitle">İzleme listeni yönet ve kaldığın yerden devam et</p>
+        </div>
+
+        <!-- Kütüphane Sekmeleri -->
+        <div class="library-tabs">
+          <button 
+            class="library-tab" 
+            [class.active]="activeLibraryTab === 'continue'"
+            (click)="setActiveLibraryTab('continue')">
+            <span>İzlemeye Devam</span>
+            <p-badge [value]="continueWatching.length" severity="secondary"></p-badge>
+          </button>
+          <button 
+            class="library-tab" 
+            [class.active]="activeLibraryTab === 'watchlist'"
+            (click)="setActiveLibraryTab('watchlist')">
+            <span>İzleme Listesi</span>
+            <p-badge [value]="watchlist.length" severity="secondary"></p-badge>
+          </button>
+          <button 
+            class="library-tab" 
+            [class.active]="activeLibraryTab === 'favorites'"
+            (click)="setActiveLibraryTab('favorites')">
+            <span>Favoriler</span>
+            <p-badge [value]="favorites.length" severity="secondary"></p-badge>
+          </button>
+          <button 
+            class="library-tab" 
+            [class.active]="activeLibraryTab === 'history'"
+            (click)="setActiveLibraryTab('history')">
+            <span>Geçmiş</span>
+            <p-badge [value]="history.length" severity="secondary"></p-badge>
+          </button>
+          <button 
+            class="library-tab" 
+            [class.active]="activeLibraryTab === 'comments'"
+            (click)="setActiveLibraryTab('comments')">
+            <span>Yorumlarım</span>
+            <p-badge [value]="comments.length" severity="secondary"></p-badge>
+          </button>
+        </div>
+
+        <!-- Aktif Sekme İçeriği -->
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">{{ getCurrentLibraryTitle() }}</h2>
+            <select class="sort-select">
+              <option>Sırala: Son Eklenen</option>
+              <option>Sırala: Alfabetik</option>
+              <option>Sırala: Tarih</option>
+            </select>
+          </div>
+
+          <!-- Alt Sekmeler (Filmler/Diziler) -->
+          <div *ngIf="activeLibraryTab !== 'comments'" class="content-type-tabs">
+            <button 
+              class="content-type-tab" 
+              [class.active]="activeContentType === 'all'"
+              (click)="setActiveContentType('all')">
+              <span>Tümü</span>
+              <p-badge [value]="getBaseContent().length" severity="secondary"></p-badge>
+            </button>
+            <button 
+              class="content-type-tab" 
+              [class.active]="activeContentType === 'movies'"
+              (click)="setActiveContentType('movies')">
+              <i class="pi pi-film"></i>
+              <span>Filmler</span>
+              <p-badge [value]="getMovies(getBaseContent()).length" severity="secondary"></p-badge>
+            </button>
+            <button 
+              class="content-type-tab" 
+              [class.active]="activeContentType === 'tvshows'"
+              (click)="setActiveContentType('tvshows')">
+              <i class="pi pi-tv"></i>
+              <span>Diziler</span>
+              <p-badge [value]="getTvShows(getBaseContent()).length" severity="secondary"></p-badge>
+            </button>
+          </div>
+
+          <div class="content-grid">
+            <!-- İzlemeye Devam / İzleme Listesi / Geçmiş / Favoriler -->
+            <div *ngIf="activeLibraryTab === 'continue' || activeLibraryTab === 'watchlist' || activeLibraryTab === 'history' || activeLibraryTab === 'favorites'">
+              <!-- İçerik Kartları -->
+              <div class="content-grid-inner" *ngIf="getCurrentLibraryContent().length > 0">
+                <div *ngFor="let item of getCurrentLibraryContent()" class="content-card">
+                  <div class="card-poster">
+                    <img [src]="item.poster" [alt]="item.title" />
+                    <div class="play-overlay">
+                      <i class="pi pi-play"></i>
+                    </div>
+                  </div>
+                  <div class="card-info">
+                    <h3 class="card-title">{{ item.title }}</h3>
+                    <p class="card-meta">
+                      <span *ngIf="item.episode">{{ item.episode }} • </span>
+                      <span *ngIf="item.remaining">{{ item.remaining }} kaldı</span>
+                      <span *ngIf="item.year && !item.episode && !item.remaining">{{ item.year }}</span>
+                      <span *ngIf="item.watchedDate">İzlendi: {{ item.watchedDate }}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Boş Durum -->
+              <div *ngIf="getCurrentLibraryContent().length === 0" class="empty-state">
+                <i class="pi" [class.pi-film]="activeContentType === 'movies'" [class.pi-tv]="activeContentType === 'tvshows'" [class.pi-inbox]="activeContentType === 'all'" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem;"></i>
+                <p style="color: var(--text-color-secondary);">
+                  <span *ngIf="activeContentType === 'all'">
+                    <span *ngIf="activeLibraryTab === 'continue'">Henüz izlemeye devam edeceğin içerik yok</span>
+                    <span *ngIf="activeLibraryTab === 'watchlist'">Henüz izleme listen yok</span>
+                    <span *ngIf="activeLibraryTab === 'history'">Henüz izleme geçmişin yok</span>
+                    <span *ngIf="activeLibraryTab === 'favorites'">Henüz favori içeriğin yok</span>
+                  </span>
+                  <span *ngIf="activeContentType === 'movies'">
+                    <span *ngIf="activeLibraryTab === 'continue'">Henüz izlemeye devam edeceğin film yok</span>
+                    <span *ngIf="activeLibraryTab === 'watchlist'">Henüz izleme listenizde film yok</span>
+                    <span *ngIf="activeLibraryTab === 'history'">Henüz izlediğin film yok</span>
+                    <span *ngIf="activeLibraryTab === 'favorites'">Henüz favori filmin yok</span>
+                  </span>
+                  <span *ngIf="activeContentType === 'tvshows'">
+                    <span *ngIf="activeLibraryTab === 'continue'">Henüz izlemeye devam edeceğin dizi yok</span>
+                    <span *ngIf="activeLibraryTab === 'watchlist'">Henüz izleme listenizde dizi yok</span>
+                    <span *ngIf="activeLibraryTab === 'history'">Henüz izlediğin dizi yok</span>
+                    <span *ngIf="activeLibraryTab === 'favorites'">Henüz favori dizin yok</span>
+                  </span>
+                </p>
+              </div>
+
+              <!-- İzlemeye Devam için Film Ara butonu -->
+              <div *ngIf="activeLibraryTab === 'continue' && getCurrentLibraryContent().length > 0" class="content-card browse-card">
+                <div class="browse-icon">
+                  <i class="pi pi-plus"></i>
+                </div>
+                <span>Film Ara</span>
+              </div>
+            </div>
+
+            <!-- Yorumlarım -->
+            <div *ngIf="activeLibraryTab === 'comments'" class="comments-container">
+              <div *ngFor="let comment of comments" class="comment-card">
+                <div class="comment-header">
+                  <div class="comment-movie-info">
+                    <img *ngIf="comment.poster" [src]="comment.poster" [alt]="comment.movieTitle" class="comment-poster" />
+                    <div class="comment-movie-details">
+                      <h3 class="comment-movie-title">{{ comment.movieTitle }}</h3>
+                      <p class="comment-date">{{ comment.date }}</p>
+                    </div>
+                  </div>
+                  <div class="comment-rating">
+                    <i class="pi pi-star-fill" *ngFor="let star of getStars(comment.rating)"></i>
+                    <span class="rating-value">{{ comment.rating }}/10</span>
+                  </div>
+                </div>
+                <div class="comment-content">
+                  <p>{{ comment.text }}</p>
+                </div>
+                <div class="comment-actions">
+                  <button class="comment-action-btn">
+                    <i class="pi pi-pencil"></i>
+                    <span>Düzenle</span>
+                  </button>
+                  <button class="comment-action-btn delete">
+                    <i class="pi pi-trash"></i>
+                    <span>Sil</span>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="comments.length === 0" class="empty-state">
+                <i class="pi pi-comment" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem;"></i>
+                <p style="color: var(--text-color-secondary);">Henüz yorum yapmadın</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Önerilenler (sadece overview'da göster) -->
+        <div *ngIf="activeLibraryTab === 'continue'" class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">Sana Önerilenler</h2>
+            <a href="#" class="view-all-link">Tümünü Gör</a>
+          </div>
+          <div class="content-grid">
+            <div class="empty-state">
+              <i class="pi pi-star" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem;"></i>
+              <p style="color: var(--text-color-secondary);">Öneriler yakında eklenecek</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ayarlar -->
+      <div *ngIf="activeTab === 'settings'" class="tab-content">
+        <div class="content-header">
+          <h1 class="page-title">Profil Ayarları</h1>
+          <p class="page-subtitle">Hesap bilgilerini ve tercihlerini güncelle</p>
+        </div>
+
+        <p-card class="settings-card">
+          <form (ngSubmit)="onSaveProfile()" class="profile-form">
+            <div class="form-group">
+              <label for="username">Kullanıcı Adı</label>
+              <input 
+                id="username"
+                type="text" 
+                pInputText 
+                [(ngModel)]="profileForm.username" 
+                name="username"
+                placeholder="Kullanıcı adınız" />
+            </div>
+
+            <div class="form-group">
+              <label for="email">E-posta</label>
+              <input 
+                id="email"
+                type="email" 
+                pInputText 
+                [(ngModel)]="profileForm.email" 
+                name="email"
+                placeholder="E-posta adresiniz" />
+            </div>
+
+            <div class="form-group">
+              <label for="bio">Hakkında</label>
+              <textarea 
+                id="bio"
+                pTextarea 
+                [(ngModel)]="profileForm.bio" 
+                name="bio"
+                rows="4"
+                placeholder="Kendin hakkında bir şeyler yaz..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Profil Fotoğrafı</label>
+              <div class="avatar-upload">
+                <p-avatar 
+                  [image]="profileForm.avatar || 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png'"
+                  [label]="!profileForm.avatar ? (profileForm.username[0] || '?') : undefined"
+                  shape="circle" 
+                  size="xlarge" />
+                <button pButton label="Fotoğraf Değiştir" type="button" class="p-button-secondary"></button>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button pButton type="submit" label="Değişiklikleri Kaydet" class="p-button-primary"></button>
+              <button pButton type="button" label="İptal" class="p-button-secondary" (click)="setActiveTab('overview')"></button>
+            </div>
+          </form>
+        </p-card>
+      </div>
+
+      <!-- Abonelik -->
+      <div *ngIf="activeTab === 'subscription'" class="tab-content">
+        <div class="content-header">
+          <h1 class="page-title">Abonelik</h1>
+          <p class="page-subtitle">Abonelik planını yönet</p>
+        </div>
+        <p-card class="settings-card">
+          <p>Abonelik yönetimi yakında eklenecek...</p>
+        </p-card>
+      </div>
+
+      <!-- Ebeveyn Kontrolü -->
+      <div *ngIf="activeTab === 'parental'" class="tab-content">
+        <div class="content-header">
+          <h1 class="page-title">Ebeveyn Kontrolü</h1>
+          <p class="page-subtitle">İçerik kısıtlamalarını yönet</p>
+        </div>
+        <p-card class="settings-card">
+          <p>Ebeveyn kontrolü yakında eklenecek...</p>
+        </p-card>
+      </div>
+    </main>
+  </div>
+</div>

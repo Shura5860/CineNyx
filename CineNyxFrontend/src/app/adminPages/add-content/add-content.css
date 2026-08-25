@@ -1,0 +1,248 @@
+/* ============================================================ */
+/* FILE MANAGER  – add-content.css                              */
+/* ============================================================ */
+
+.fm-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ---- Header ---- */
+.fm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fm-header-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fm-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.fm-meta {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+/* ---- Sections ---- */
+.fm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---- Card header (shared) ---- */
+.fm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+}
+
+.fm-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+/* ---- Target banner ---- */
+.fm-target-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--border-radius);
+  background: var(--highlight-bg);
+  color: var(--highlight-text-color);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ---- File body ---- */
+.fm-file-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fm-current-file {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.fm-file-url {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: var(--text-color-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 600px;
+}
+
+.fm-no-file {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color-secondary);
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.fm-no-file-inline {
+  color: var(--text-color-secondary);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+/* ---- Upload button ---- */
+.fm-upload-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.fm-upload-btn,
+.fm-upload-btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+.fm-upload-btn:hover,
+.fm-upload-btn-sm:hover {
+  background: var(--primary-color);
+  color: var(--primary-color-text);
+}
+
+.fm-upload-btn-sm {
+  padding: 0.3rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+/* ---- Option rows (sound / subtitle) ---- */
+.fm-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.fm-option-row:last-child {
+  border-bottom: none;
+}
+
+.fm-option-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.fm-option-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+/* ---- Episode selected row highlight ---- */
+.selected-row {
+  background: var(--highlight-bg) !important;
+}
+
+/* ---- Empty state (serie no episode selected) ---- */
+.fm-empty-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--text-color-secondary);
+  text-align: center;
+}
+
+.fm-empty-hint i {
+  font-size: 2rem;
+}
+
+/* ---- Dialog ---- */
+.fm-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.fm-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.fm-form-group label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.fm-form-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.fm-form-row .fm-form-group {
+  flex: 1;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .fm-container {
+    padding: 1rem;
+  }
+
+  .fm-title {
+    font-size: 1.15rem;
+  }
+
+  .fm-file-url {
+    max-width: 200px;
+  }
+
+  .fm-form-row {
+    flex-direction: column;
+  }
+}

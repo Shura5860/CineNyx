@@ -1,0 +1,111 @@
+<div class="dashboard-container">
+  <!-- Başlık -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Dashboard</h1>
+      <p class="dashboard-subtitle">Hoş geldiniz! İşte genel bakışınız.</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        pButton 
+        label="Yeni Film Ekle" 
+        icon="pi pi-plus" 
+        class="p-button-primary"
+        (click)="goToMovies()">
+      </button>
+      <button 
+        pButton 
+        label="Yeni Dizi Ekle" 
+        icon="pi pi-plus" 
+        class="p-button-primary"
+        (click)="goToTvShows()">
+      </button>
+    </div>
+  </div>
+
+  <!-- İstatistik Kartları -->
+  <div class="stats-grid">
+    <div *ngFor="let stat of stats" class="stat-card" [style.border-left-color]="stat.color">
+      <div class="stat-icon" [style.background]="stat.color + '20'">
+        <i [class]="stat.icon" [style.color]="stat.color"></i>
+      </div>
+      <div class="stat-content">
+        <p class="stat-title">{{ stat.title }}</p>
+        <h2 class="stat-value">{{ stat.value }}</h2>
+        <div class="stat-change" [class.positive]="stat.trend === 'up'">
+          <i [class]="stat.trend === 'up' ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+          <span>{{ stat.change }}</span>
+          <span class="stat-period">bu ay</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grafik -->
+  <div class="chart-card-full">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h3>Haftalık İstatistikler</h3>
+          <div class="card-actions">
+            <button pButton icon="pi pi-refresh" class="p-button-text p-button-sm"></button>
+          </div>
+        </div>
+      </ng-template>
+      <p-chart type="line" [data]="chartData" [options]="chartOptions" [style]="{'height': '400px'}"></p-chart>
+    </p-card>
+  </div>
+
+  <!-- Popüler İçerikler -->
+  <div class="popular-content-card">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h3>Popüler İçerikler</h3>
+          <button pButton label="Tümünü Gör" class="p-button-text p-button-sm"></button>
+        </div>
+      </ng-template>
+      <p-table [value]="popularContent" [tableStyle]="{'min-width': '50rem'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Başlık</th>
+            <th>Tür</th>
+            <th>İzlenme</th>
+            <th>Puan</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-content>
+          <tr>
+            <td>
+              <div class="content-title">
+                <strong>{{ content.title }}</strong>
+              </div>
+            </td>
+            <td>
+              <span class="content-type">{{ content.type }}</span>
+            </td>
+            <td>{{ content.views }}</td>
+            <td>
+              <div class="rating">
+                <i class="pi pi-star-fill" style="color: #F59E0B;"></i>
+                <span>{{ content.rating }}</span>
+              </div>
+            </td>
+            <td>
+              <p-tag [value]="content.status === 'active' ? 'Aktif' : 'Pasif'" 
+                     [severity]="getStatusSeverity(content.status)"></p-tag>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button pButton icon="pi pi-pencil" class="p-button-text p-button-sm" pTooltip="Düzenle"></button>
+                <button pButton icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger" pTooltip="Sil"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+</div>

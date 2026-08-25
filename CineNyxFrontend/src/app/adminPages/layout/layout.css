@@ -1,0 +1,322 @@
+/* Admin Layout - Ana Site Teması */
+:root {
+  --admin-primary: #E50914;
+  --admin-dark: #0A0A0B;
+  --admin-surface: #141417;
+  --admin-text: #FFFFFF;
+  --admin-text-secondary: #A3A3A3;
+}
+
+body {
+  background: var(--admin-dark) !important;
+  color: var(--admin-text) !important;
+}
+
+.sidebar-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    max-width: 260px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background: var(--admin-surface);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.3);
+}
+
+::ng-deep .sidebar-container .p-menu {
+    height: 100vh !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    border: none !important;
+    margin: 0;
+    background: var(--admin-surface) !important;
+    border-radius: 0 !important;
+}
+
+::ng-deep .sidebar-container .p-menu .p-menu-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem 0.5rem;
+}
+
+::ng-deep .sidebar-container .p-menu ul {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Logo alanı */
+::ng-deep .sidebar-container .p-menu .p-menu-start {
+    padding: 1.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.admin-logo-img {
+    height: 64px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Menü item'ları */
+::ng-deep .sidebar-container .p-menu .p-menuitem-link {
+    color: var(--admin-text-secondary) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    margin-bottom: 0.25rem;
+}
+
+::ng-deep .sidebar-container .p-menu .p-menuitem-link:hover {
+    background: rgba(229, 9, 20, 0.1) !important;
+    color: var(--admin-text) !important;
+}
+
+::ng-deep .sidebar-container .p-menu .p-menuitem-link.p-menuitem-active,
+::ng-deep .sidebar-container .p-menu .p-menuitem-link.router-link-active {
+    background: rgba(229, 9, 20, 0.15) !important;
+    color: var(--admin-primary) !important;
+}
+
+::ng-deep .sidebar-container .p-menu .p-menuitem-link .p-menuitem-icon {
+    color: inherit;
+    margin-right: 0.75rem;
+}
+
+/* Submenu header */
+::ng-deep .sidebar-container .p-menu .p-submenu-header {
+    padding: 0.75rem 1rem !important;
+    color: var(--admin-text) !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+::ng-deep .sidebar-container .p-menu .p-menu-separator {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin: 0.75rem 0;
+}
+
+/* Badge */
+::ng-deep .sidebar-container .p-menu .p-badge {
+    background: var(--admin-primary) !important;
+    color: #fff !important;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+}
+
+/* Shortcut */
+::ng-deep .sidebar-container .p-menu .shortcut {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    color: var(--admin-text-secondary);
+}
+
+/* Alt kısım - kullanıcı bilgisi */
+::ng-deep .sidebar-container .p-menu .p-menu-end {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: auto;
+}
+
+.admin-user-section {
+    position: relative;
+}
+
+.admin-user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.admin-user-info:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-user-info i.pi-chevron-up {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--admin-text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.admin-user-info i.pi-chevron-up.rotated {
+    transform: rotate(180deg);
+}
+
+.admin-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.admin-user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--admin-text);
+}
+
+.admin-user-role {
+    font-size: 0.8rem;
+    color: var(--admin-text-secondary);
+}
+
+/* Profil Menüsü Dropdown */
+.profile-menu-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    margin-bottom: 0.5rem;
+    background: var(--admin-surface);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.profile-menu-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: var(--admin-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.profile-menu-item:last-child {
+    border-bottom: none;
+}
+
+.profile-menu-item:hover {
+    background: rgba(229, 9, 20, 0.15);
+    color: var(--admin-primary);
+}
+
+.profile-menu-item i {
+    font-size: 1rem;
+    color: inherit;
+}
+
+.profile-menu-item span {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Top Menubar */
+::ng-deep .card .p-menubar {
+    background: var(--admin-surface) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 2rem !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+::ng-deep .card .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-button {
+    color: var(--admin-text-secondary) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+::ng-deep .card .p-menubar .p-menubar-root-list > .p-menubar-item > .p-menubar-button:hover {
+    background: rgba(229, 9, 20, 0.1) !important;
+    color: var(--admin-text) !important;
+}
+
+::ng-deep .card .p-menubar .p-menubar-root-list > .p-menubar-item.p-menubar-item-active > .p-menubar-button {
+    background: rgba(229, 9, 20, 0.15) !important;
+    color: var(--admin-primary) !important;
+}
+
+/* Global Styles - arka plan viewport'un en üstüne kadar kaplasın */
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+:host::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--admin-dark, #0A0A0B);
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Modern Background Gradient - sayfanın tamamını kaplar */
+:host::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(229, 9, 20, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(229, 9, 20, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Ana içerik alanı */
+.admin-content-wrapper {
+    margin-left: 0;
+    background: transparent;
+    min-height: 100vh;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .admin-content-wrapper {
+        margin-left: 260px;
+    }
+}

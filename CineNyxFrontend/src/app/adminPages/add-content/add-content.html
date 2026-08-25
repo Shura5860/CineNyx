@@ -1,0 +1,309 @@
+<!-- ============================================================ -->
+<!-- FILE MANAGER PAGE                                            -->
+<!-- ============================================================ -->
+<div class="fm-container">
+
+  <!-- HEADER -->
+  <div class="fm-header">
+    <div class="fm-header-left">
+      <button pButton icon="pi pi-arrow-left" class="p-button-text" (click)="goBack()" pTooltip="Geri Dön"></button>
+      <div>
+        <h1 class="fm-title">{{ content?.title || 'Yükleniyor…' }}</h1>
+        <div class="fm-meta">
+          <p-tag *ngIf="content" [value]="contentType === 'movie' ? 'Film' : 'Dizi'"
+                 [severity]="contentType === 'movie' ? 'info' : 'warn'"></p-tag>
+          <p-tag *ngIf="content" [value]="content.status === 'published' ? 'Yayında' : 'Taslak'"
+                 [severity]="content.status === 'published' ? 'success' : 'secondary'"></p-tag>
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-header-right">
+      <button *ngIf="content && content.status !== 'published'" pButton label="Yayınla" icon="pi pi-check-circle"
+              class="p-button-success" (click)="publishContent()"></button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <p-progressBar *ngIf="loading" mode="indeterminate" [style]="{'height':'4px'}"></p-progressBar>
+
+  <!-- ========== SERIE: EPISODE LIST ========== -->
+  <div *ngIf="contentType === 'serie' && !loading" class="fm-section">
+    <p-card>
+      <ng-template #header>
+        <div class="fm-card-header">
+          <span class="fm-card-title"><i class="pi pi-list"></i> Bölümler</span>
+          <button pButton label="Bölüm Ekle" icon="pi pi-plus" class="p-button-sm" (click)="openEpisodeDialog()"></button>
+        </div>
+      </ng-template>
+
+      <p-table [value]="episodes" [rows]="50" styleClass="p-datatable-sm p-datatable-striped"
+               selectionMode="single" [(selection)]="selectedEpisode" (onRowSelect)="selectEpisode($any($event).data)"
+               dataKey="_id">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width:60px">Sezon</th>
+            <th style="width:60px">Bölüm</th>
+            <th>Başlık</th>
+            <th style="width:100px">Video</th>
+            <th style="width:80px">İşlem</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ep>
+          <tr [pSelectableRow]="ep" [class.selected-row]="selectedEpisode?._id === ep._id">
+            <td>{{ ep.season }}</td>
+            <td>{{ ep.episode }}</td>
+            <td>{{ ep.title }}</td>
+            <td>
+              <p-tag *ngIf="ep.videoPath || ep.video_url_1080" value="Var" severity="success"></p-tag>
+              <p-tag *ngIf="!ep.videoPath && !ep.video_url_1080" value="Yok" severity="danger"></p-tag>
+            </td>
+            <td>
+              <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                      (click)="confirmDeleteEpisode(ep)" pTooltip="Sil"></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center">Henüz bölüm eklenmemiş.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
+  <!-- ========== FILE MANAGEMENT SECTION ========== -->
+  <div *ngIf="!loading && targetId" class="fm-section">
+
+    <!-- Header showing what we're editing -->
+    <div class="fm-target-banner">
+      <i class="pi pi-file-edit"></i>
+      <span>Dosya yönetimi: <strong>{{ targetLabel }}</strong></span>
+    </div>
+
+    <!-- VIDEO -->
+    <p-card styleClass="fm-file-card">
+      <ng-template #header>
+        <div class="fm-card-header">
+          <span class="fm-card-title"><i class="pi pi-video"></i> Video</span>
+        </div>
+      </ng-template>
+
+      <div class="fm-file-body">
+        <div *ngIf="currentVideoPath" class="fm-current-file">
+          <i class="pi pi-check-circle text-green-500"></i>
+          <span class="fm-file-url" [title]="currentVideoPath">{{ currentVideoPath }}</span>
+        </div>
+        <div *ngIf="!currentVideoPath" class="fm-no-file">
+          <i class="pi pi-info-circle"></i> Henüz video yüklenmemiş.
+        </div>
+
+        <p-progressBar *ngIf="videoUploading" mode="indeterminate" [style]="{'height':'4px','margin-top':'8px'}"></p-progressBar>
+
+        <div class="fm-upload-row">
+          <label class="fm-upload-btn" for="videoInput">
+            <i class="pi pi-upload"></i> {{ currentVideoPath ? 'Videoyu Değiştir' : 'Video Yükle' }}
+          </label>
+          <input id="videoInput" type="file" accept="video/*" (change)="onVideoFileSelected($event)" hidden />
+        </div>
+      </div>
+    </p-card>
+
+    <!-- SOUND OPTIONS -->
+    <p-card styleClass="fm-file-card">
+      <ng-template #header>
+        <div class="fm-card-header">
+          <span class="fm-card-title"><i class="pi pi-volume-up"></i> Ses Dosyaları</span>
+          <button pButton label="Dil Ekle" icon="pi pi-plus" class="p-button-sm p-button-outlined" (click)="openSoundDialog()"></button>
+        </div>
+      </ng-template>
+
+      <p-progressBar *ngIf="soundUploading" mode="indeterminate" [style]="{'height':'4px'}"></p-progressBar>
+
+      <div *ngIf="soundOptions.length === 0" class="fm-no-file">
+        <i class="pi pi-info-circle"></i> Henüz ses seçeneği eklenmemiş.
+      </div>
+
+      <div *ngFor="let opt of soundOptions" class="fm-option-row">
+        <div class="fm-option-info">
+          <p-tag [value]="opt.language" severity="info"></p-tag>
+          <span *ngIf="opt.path" class="fm-file-url" [title]="opt.path">{{ opt.path }}</span>
+          <span *ngIf="!opt.path" class="fm-no-file-inline">Dosya yüklenmemiş</span>
+        </div>
+        <div class="fm-option-actions">
+          <label class="fm-upload-btn-sm" [for]="'soundInput_' + opt._id" pTooltip="Ses dosyası yükle">
+            <i class="pi pi-upload"></i>
+          </label>
+          <input [id]="'soundInput_' + opt._id" type="file" accept="audio/*" (change)="onSoundFileSelected($event, opt)" hidden />
+          <label class="fm-upload-btn-sm" [for]="'soundVideoInput_' + opt._id" pTooltip="Videodan ses çıkar">
+            <i class="pi pi-video"></i>
+          </label>
+          <input [id]="'soundVideoInput_' + opt._id" type="file" accept="video/*" (change)="onSoundVideoSelected($event, opt)" hidden />
+          <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  (click)="confirmDeleteSound(opt)" pTooltip="Sil"></button>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- SUBTITLE OPTIONS -->
+    <p-card styleClass="fm-file-card">
+      <ng-template #header>
+        <div class="fm-card-header">
+          <span class="fm-card-title"><i class="pi pi-file"></i> Altyazı Dosyaları</span>
+          <div style="display:flex;gap:.5rem">
+            <button pButton label="OpenSubtitles" icon="pi pi-globe" class="p-button-sm p-button-success" (click)="openOsSearch()"></button>
+            <button pButton label="Dil Ekle" icon="pi pi-plus" class="p-button-sm p-button-outlined" (click)="openSubtitleDialog()"></button>
+          </div>
+        </div>
+      </ng-template>
+
+      <p-progressBar *ngIf="subtitleUploading" mode="indeterminate" [style]="{'height':'4px'}"></p-progressBar>
+
+      <div *ngIf="subtitleOptions.length === 0" class="fm-no-file">
+        <i class="pi pi-info-circle"></i> Henüz altyazı seçeneği eklenmemiş.
+      </div>
+
+      <div *ngFor="let opt of subtitleOptions" class="fm-option-row">
+        <div class="fm-option-info">
+          <p-tag [value]="opt.language" severity="warn"></p-tag>
+          <span *ngIf="opt.path" class="fm-file-url" [title]="opt.path">{{ opt.path }}</span>
+          <span *ngIf="!opt.path" class="fm-no-file-inline">Dosya yüklenmemiş</span>
+        </div>
+        <div class="fm-option-actions">
+          <label class="fm-upload-btn-sm" [for]="'subInput_' + opt._id">
+            <i class="pi pi-upload"></i>
+          </label>
+          <input [id]="'subInput_' + opt._id" type="file" accept=".vtt,.srt" (change)="onSubtitleFileSelected($event, opt)" hidden />
+          <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  (click)="confirmDeleteSubtitle(opt)" pTooltip="Sil"></button>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- No target selected hint (serie mode only) -->
+  <div *ngIf="!loading && contentType === 'serie' && !targetId" class="fm-empty-hint">
+    <i class="pi pi-arrow-up"></i>
+    <p>Dosyaları düzenlemek için yukarıdan bir bölüm seçin.</p>
+  </div>
+</div>
+
+<!-- ========== DIALOGS ========== -->
+
+<!-- Episode dialog -->
+<p-dialog [(visible)]="showEpisodeDialog" header="Yeni Bölüm Ekle" [modal]="true"
+          [style]="{width:'420px'}" [draggable]="false" [resizable]="false">
+  <div class="fm-dialog-body">
+    <div class="fm-form-group">
+      <label>Başlık *</label>
+      <input pInputText [(ngModel)]="newEpisode.title" placeholder="Bölüm adı" class="w-full" />
+    </div>
+    <div class="fm-form-row">
+      <div class="fm-form-group">
+        <label>Sezon</label>
+        <p-inputNumber [(ngModel)]="newEpisode.season" [min]="1" [showButtons]="true" class="w-full"></p-inputNumber>
+      </div>
+      <div class="fm-form-group">
+        <label>Bölüm</label>
+        <p-inputNumber [(ngModel)]="newEpisode.episode" [min]="1" [showButtons]="true" class="w-full"></p-inputNumber>
+      </div>
+    </div>
+    <div class="fm-form-group">
+      <label>Açıklama</label>
+      <input pInputText [(ngModel)]="newEpisode.description" placeholder="Opsiyonel" class="w-full" />
+    </div>
+  </div>
+  <ng-template #footer>
+    <button pButton label="İptal" icon="pi pi-times" class="p-button-text" (click)="showEpisodeDialog = false"></button>
+    <button pButton label="Kaydet" icon="pi pi-check" (click)="saveEpisode()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Sound language dialog -->
+<p-dialog [(visible)]="showSoundDialog" header="Ses Dili Ekle" [modal]="true"
+          [style]="{width:'360px'}" [draggable]="false" [resizable]="false">
+  <div class="fm-dialog-body">
+    <div class="fm-form-group">
+      <label>Dil kodu (ör. tr, en, de)</label>
+      <input pInputText [(ngModel)]="newLanguage" placeholder="tr" class="w-full" />
+    </div>
+  </div>
+  <ng-template #footer>
+    <button pButton label="İptal" icon="pi pi-times" class="p-button-text" (click)="showSoundDialog = false"></button>
+    <button pButton label="Ekle" icon="pi pi-check" (click)="addSoundOption()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Subtitle language dialog -->
+<p-dialog [(visible)]="showSubtitleDialog" header="Altyazı Dili Ekle" [modal]="true"
+          [style]="{width:'360px'}" [draggable]="false" [resizable]="false">
+  <div class="fm-dialog-body">
+    <div class="fm-form-group">
+      <label>Dil kodu (ör. tr, en, de)</label>
+      <input pInputText [(ngModel)]="newLanguage" placeholder="tr" class="w-full" />
+    </div>
+  </div>
+  <ng-template #footer>
+    <button pButton label="İptal" icon="pi pi-times" class="p-button-text" (click)="showSubtitleDialog = false"></button>
+    <button pButton label="Ekle" icon="pi pi-check" (click)="addSubtitleOption()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Video Audio Extraction dialog -->
+<p-dialog [(visible)]="showVideoAudioDialog" header="Video Yükleme Ayarları" [modal]="true"
+          [style]="{width:'440px'}" [draggable]="false" [resizable]="false" [closable]="false">
+  <div class="fm-dialog-body">
+    <p style="margin-bottom: 1rem; color: var(--text-color-secondary);">
+      Yüklenecek videoda ses var mı? Varsa otomatik olarak ses dosyası çıkarılıp ses seçeneklerine eklenecektir.
+    </p>
+    <div class="fm-form-group" style="margin-bottom: 1rem;">
+      <p-checkbox [(ngModel)]="videoHasAudio" [binary]="true" label="Bu videoda ses var"></p-checkbox>
+    </div>
+    <div *ngIf="videoHasAudio" class="fm-form-group">
+      <label>Ses Dili (ör. tr, en, de)</label>
+      <input pInputText [(ngModel)]="videoAudioLanguage" placeholder="tr" class="w-full" />
+    </div>
+  </div>
+  <ng-template #footer>
+    <button pButton label="İptal" icon="pi pi-times" class="p-button-text" (click)="cancelVideoUpload()"></button>
+    <button pButton label="Yükle" icon="pi pi-upload" 
+            [disabled]="videoHasAudio && !videoAudioLanguage"
+            (click)="confirmVideoUpload()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- OpenSubtitles Search dialog -->
+<p-dialog [(visible)]="showOsSearchDialog" header="OpenSubtitles Altyazıları" [modal]="true"
+          [style]="{width:'560px', maxHeight:'85vh'}" [draggable]="false" [resizable]="false">
+  <div class="fm-dialog-body">
+
+    <p-progressBar *ngIf="osSearching" mode="indeterminate" [style]="{'height':'4px','margin-bottom':'1rem'}"></p-progressBar>
+
+    <div *ngIf="osResults.length === 0 && !osSearching" style="text-align:center;color:var(--text-color-secondary);padding:2rem 0">
+      <i class="pi pi-info-circle"></i> Bu içerik için OpenSubtitles'ta altyazı bulunamadı.
+    </div>
+
+    <div *ngIf="osResults.length > 0 && !osSearching" style="margin-bottom:.75rem;color:var(--text-color-secondary);font-size:.9rem">
+      <i class="pi pi-check-circle"></i> {{ osResults.length }} dilde altyazı bulundu. İstediğiniz dilleri indirin.
+    </div>
+
+    <div *ngIf="osResults.length > 0" style="max-height:55vh;overflow-y:auto">
+      <div *ngFor="let item of osResults" style="display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;border-bottom:1px solid var(--surface-border)">
+        <div style="display:flex;align-items:center;gap:.75rem">
+          <p-tag [value]="item.language" severity="info" style="min-width:36px;text-align:center"></p-tag>
+          <div>
+            <div style="font-size:.85rem;word-break:break-all">{{ item.fileName }}</div>
+            <div style="font-size:.75rem;color:var(--text-color-secondary)">{{ item.downloadCount }} indirme</div>
+          </div>
+        </div>
+        <button pButton label="İndir" icon="pi pi-download" class="p-button-sm p-button-success"
+                [loading]="osImporting === item.fileId" [disabled]="osImporting !== null"
+                (click)="importOsSubtitle(item)"></button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

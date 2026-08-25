@@ -1,0 +1,203 @@
+<div class="layout-wrapper">
+    <div class="card navbar" [class.navbar-hidden]="isNavbarHidden">
+        <p-menubar [model]="items">
+            <ng-template #start>
+                <a routerLink="/" class="logo-link">
+                  <img src="assets/images/logo.png" alt="Logo" class="logo-img" width="76" height="38" loading="eager" />
+                </a>
+            </ng-template>
+            <ng-template #item let-item let-root="root">
+                <a pRipple 
+                   [routerLink]="item.routerLink || null" 
+                   [routerLinkActive]="'active'"
+                   class="flex items-center px-4 py-3 cursor-pointer gap-2">
+                    <span>{{ item.label }}</span>
+                    <p-badge *ngIf="item.badge" [ngClass]="{ 'ms-auto': !root }" [value]="item.badge" />
+                    <span *ngIf="item.shortcut"
+                        class="ms-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{
+                        item.shortcut }}</span>
+                    <i *ngIf="item.items" [ngClass]="['ms-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
+                </a>
+            </ng-template>
+            <ng-template #end>
+                <div class="flex items-center gap-2">
+                    <!-- Kayıt Ol/Giriş Yap Butonu - sadece giriş yapılmamışsa göster -->
+                    <button *ngIf="!currentUser" class="auth-btn" (click)="onAuthClick()">
+                        <span>Kayıt Ol / Giriş Yap</span>
+                    </button>
+                    
+                    <!-- Arama Robotu Dropdown -->
+                    <div class="search-robot-container" [class.open]="isSearchRobotOpen">
+                        <button class="search-robot-trigger" aria-label="Arama Robotu" (click)="toggleSearchRobot()">
+                            <i class="pi pi-sliders-h"></i>
+                            <span>Arama Robotu</span>
+                        </button>
+                        <div class="search-robot-dropdown">
+                            <p class="search-robot-hint">Seçeneklerin hepsini seçmenize gerek yoktur.</p>
+                            
+                            <div class="filter-row">
+                                <label>Film Tarzı</label>
+                                <p-select [options]="filmTarzOptions" [(ngModel)]="selectedFilmTarz" 
+                                    optionLabel="label" optionValue="value"
+                                    placeholder="Seçiniz" [showClear]="true" class="filter-dropdown"></p-select>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <label>Film Türü</label>
+                                <p-select [options]="filmTurOptions" [(ngModel)]="selectedFilmTur" 
+                                    optionLabel="label" optionValue="value"
+                                    placeholder="Seçiniz" [showClear]="true" class="filter-dropdown"></p-select>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <label>Film Yılı</label>
+                                <p-select [options]="filmYilOptions" [(ngModel)]="selectedFilmYil" 
+                                    optionLabel="label" optionValue="value"
+                                    placeholder="Seçiniz" [showClear]="true" class="filter-dropdown"></p-select>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <label>IMDB Puanı</label>
+                                <p-select [options]="imdbPuanOptions" [(ngModel)]="selectedImdbPuan" 
+                                    optionLabel="label" optionValue="value"
+                                    placeholder="Seçiniz" [showClear]="true" class="filter-dropdown"></p-select>
+                            </div>
+                            
+                            <div class="filter-row">
+                                <label>Film Kalitesi</label>
+                                <p-select [options]="filmKaliteOptions" [(ngModel)]="selectedFilmKalite" 
+                                    optionLabel="label" optionValue="value"
+                                    placeholder="Seçiniz" [showClear]="true" class="filter-dropdown"></p-select>
+                            </div>
+                            
+                            <div class="filter-actions">
+                                <button pButton label="Filmleri Getir" class="p-button-primary search-btn" (click)="onSearch()"></button>
+                                <button pButton label="Sıfırla" class="p-button-secondary reset-btn" (click)="onReset()"></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="search-container">
+                        <input type="text" pInputText placeholder="Ara..." class="search-input" />
+                        <button class="search-icon-btn" aria-label="Search">
+                            <i class="pi pi-search"></i>
+                        </button>
+                    </div>
+                    <div class="profile-container">
+                        <p-avatar 
+                            [image]="currentUser ? 'https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png' : undefined"
+                            [label]="currentUser ? undefined : '?'"
+                            shape="circle" 
+                            (click)="onProfileClick($event)"
+                            styleClass="profile-avatar"
+                            [style]="{ cursor: 'pointer' }" />
+                        <div class="profile-menu" [class.open]="isProfileMenuOpen" *ngIf="currentUser">
+                            <div class="profile-menu-header">
+                                <p-avatar 
+                                    image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" 
+                                    shape="circle" 
+                                    size="large" />
+                                <div class="profile-info">
+                                    <div class="profile-name">{{ currentUser?.username || 'Kullanıcı' }}</div>
+                                    <div class="profile-email">{{ currentUser?.email || 'user@example.com' }}</div>
+                                </div>
+                            </div>
+                            <div class="profile-menu-divider"></div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('continue', $event)">
+                                <i class="pi pi-play-circle"></i>
+                                <span>İzlemeye Devam</span>
+                            </div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('watchlist', $event)">
+                                <i class="pi pi-bookmark"></i>
+                                <span>İzleme Listesi</span>
+                            </div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('favorites', $event)">
+                                <i class="pi pi-heart"></i>
+                                <span>Favoriler</span>
+                            </div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('history', $event)">
+                                <i class="pi pi-history"></i>
+                                <span>Geçmiş</span>
+                            </div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('comments', $event)">
+                                <i class="pi pi-comment"></i>
+                                <span>Yorumlarım</span>
+                            </div>
+                            <div class="profile-menu-divider"></div>
+                            <div class="profile-menu-item" (click)="onProfileMenuAction('edit', $event)">
+                                <i class="pi pi-user-edit"></i>
+                                <span>Profili Düzenle</span>
+                            </div>
+                            <div class="profile-menu-item logout" (click)="onProfileMenuAction('logout', $event)">
+                                <i class="pi pi-sign-out"></i>
+                                <span>Çıkış Yap</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-menubar>
+    </div>
+
+    <app-auth-modal></app-auth-modal>
+
+    <main class="content">
+        <router-outlet></router-outlet>
+    </main>
+
+    <footer class="footer">
+        <p-divider></p-divider>
+
+        <div class="footer-content">
+            <div class="left">
+                <a routerLink="/" class="footer-logo-link">
+                    <img src="assets/images/logo.png" alt="CineNyx" class="footer-logo-img" width="76" height="38" />
+                </a>
+                <p class="desc">
+                    Türkiye'nin en kapsamlı film ve dizi izleme platformu. Binlerce içerik, yüksek kalite, kesintisiz izleme deneyimi.
+                </p>
+            </div>
+
+            <div class="center">
+                <div class="footer-links-column">
+                    <h4 class="footer-column-title">Hızlı Erişim</h4>
+                    <a routerLink="/movies">Filmler</a>
+                    <a routerLink="/tv-shows">Diziler</a>
+                    <a routerLink="/">Ana Sayfa</a>
+                </div>
+                <div class="footer-links-column">
+                    <h4 class="footer-column-title">Kurumsal</h4>
+                    <a href="#">Hakkımızda</a>
+                    <a href="#">İletişim</a>
+                    <a href="#">Gizlilik Politikası</a>
+                    <a href="#">Kullanım Şartları</a>
+                </div>
+            </div>
+
+            <div class="right">
+                <div class="social-section">
+                    <h4 class="footer-column-title">Bizi Takip Edin</h4>
+                    <div class="social-buttons">
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="pi pi-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="pi pi-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="pi pi-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="YouTube">
+                            <i class="pi pi-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright">
+            <p>© 2026 CineNyx.com - Tüm hakları saklıdır.</p>
+            <p class="copyright-note"></p>
+        </div>
+    </footer>
+</div>

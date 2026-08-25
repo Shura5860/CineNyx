@@ -1,0 +1,45 @@
+<div class="sidebar-container">
+    <p-menu [model]="items" class="flex" styleClass="w-full md:w-60 h-full">
+        <ng-template #start>
+            <div class="admin-logo-container">
+                <img src="assets/images/logo.png" alt="Logo" class="admin-logo-img" width="120" height="64" loading="eager" />
+            </div>
+        </ng-template>
+        <ng-template #submenuheader let-item>
+            <span class="text-primary font-bold">{{ item.label }}</span>
+        </ng-template>
+        <ng-template #item let-item>
+            <a pRipple class="flex items-center px-3 py-2 cursor-pointer" [class]="item.linkClass" [routerLink]="item.routerLink || null">
+                <span [class]="item.icon"></span>
+                <span class="ms-2">{{ item.label }}</span>
+                <p-badge *ngIf="item.badge" class="ms-auto" [value]="item.badge" />
+                <span *ngIf="item.shortcut" class="ms-auto shortcut">{{ item.shortcut }}</span>
+            </a>
+        </ng-template>
+        <ng-template #end>
+            <div class="admin-user-section">
+                <div class="admin-user-info" (click)="toggleProfileMenu()">
+                    <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle" size="large" />
+                    <div class="admin-user-details">
+                        <span class="admin-user-name">Amy Elsner</span>
+                        <span class="admin-user-role">Admin</span>
+                    </div>
+                    <i class="pi pi-chevron-up" [class.rotated]="isProfileMenuOpen"></i>
+                </div>
+                
+                <!-- Profil Menüsü -->
+                <div class="profile-menu-dropdown" [class.open]="isProfileMenuOpen">
+                    <div class="profile-menu-item" (click)="onLogout()">
+                        <i class="pi pi-sign-out"></i>
+                        <span>Çıkış Yap</span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </p-menu>
+</div>
+
+<div class="admin-content-wrapper">
+    <p-toast />
+    <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,175 @@
+<div class="background-gradient"></div>
+<div class="player-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <h2>Video yükleniyor...</h2>
+  </div>
+
+  <!-- Player Content -->
+  <div *ngIf="!loading" class="player-content">
+    <div class="player-main">
+      <!-- Film Bilgileri Header -->
+      <div class="film-header">
+        <div class="film-header-content">
+          <div class="film-poster-wrapper">
+            <img [src]="posterUrl" [alt]="filmTitle" class="film-poster" (error)="$any($event.target).src=''" />
+          </div>
+          <div class="film-info">
+            <div class="film-title-section">
+              <h1 class="film-title">{{ filmTitle || 'Film İzle' }}</h1>
+              <div class="film-meta">
+                <span *ngIf="filmYear" class="meta-item">{{ filmYear }}</span>
+                <span *ngIf="filmImdb" class="meta-item imdb-score">
+                  <i class="pi pi-star-fill"></i>
+                  {{ filmImdb.toFixed(1) }}
+                </span>
+                <span *ngIf="filmGenres.length" class="meta-item genres">
+                  {{ getGenreNames(filmGenres) }}
+                </span>
+              </div>
+            </div>
+            <p *ngIf="filmDescription" class="film-description">{{ filmDescription }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Player -->
+      <div class="player-wrapper">
+        <div 
+          class="sakura-player"
+          [attr.data-mp4360]="videoUrl360 || null"
+          [attr.data-mp4480]="videoUrl480 || null"
+          [attr.data-mp4720]="videoUrl720 || null"
+          [attr.data-mp41080]="videoUrl1080 || null"
+          [attr.data-hls]="hlsUrl || null"
+          [attr.data-poster]="posterUrl || null"
+          [attr.data-sub-tr]="subtitleTr || null"
+          [attr.data-sub-en]="subtitleEn || null"
+          [attr.data-default-sub]="defaultSub">
+        </div>
+      </div>
+
+      <!-- Ses Dili Seçimi -->
+      <div *ngIf="soundOptions.length > 0" class="audio-selector">
+        <div class="audio-selector-label">
+          <i class="pi pi-volume-up"></i>
+          <span>Ses Dili</span>
+        </div>
+        <div class="audio-options">
+          <button
+            class="audio-option"
+            [class.active]="selectedSoundIndex === -1"
+            (click)="selectAudioTrack(-1)">
+            <i class="pi pi-video"></i>
+            Orijinal
+          </button>
+          <button
+            *ngFor="let sound of soundOptions; let i = index"
+            class="audio-option"
+            [class.active]="selectedSoundIndex === i"
+            (click)="selectAudioTrack(i)">
+            <i class="pi pi-volume-up"></i>
+            {{ sound.language }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Yorumlar Bölümü -->
+      <div class="comments-section">
+      <h2 class="comments-title">Yorumlar</h2>
+      
+      <!-- Yorum Yazma Formu -->
+      <div *ngIf="currentUser" class="comment-form">
+        <div class="comment-form-header">
+          <p-avatar [label]="(currentUser?.username?.charAt(0) || '?').toUpperCase()" shape="circle" styleClass="comment-avatar"></p-avatar>
+          <div class="comment-form-content">
+            <textarea
+              pTextarea
+              [(ngModel)]="newCommentText"
+              placeholder="Yorumunuzu yazın..."
+              rows="4"
+              maxlength="1000"
+              class="comment-input w-full">
+            </textarea>
+            <div class="comment-form-actions">
+              <span class="char-count">{{ newCommentText.length }} / 1000</span>
+              <button 
+                pButton 
+                label="Yorum Yap" 
+                class="p-button-primary"
+                [disabled]="!newCommentText.trim() || isSubmittingComment"
+                [loading]="isSubmittingComment"
+                (click)="submitComment()">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!currentUser" class="comment-login-prompt">
+        <p>Yorum yapmak için <a (click)="openAuthModal(); $event.preventDefault()" class="login-link" href="#">giriş yapın</a></p>
+      </div>
+
+      <!-- Yorum Listesi -->
+      <div class="comments-list">
+        <div *ngIf="comments.length === 0" class="no-comments">
+          <p>Henüz yorum yapılmamış. İlk yorumu sen yap!</p>
+        </div>
+        
+        <div *ngFor="let comment of comments" class="comment-item">
+          <p-avatar 
+            [label]="getCommentAvatarLabel(comment)" 
+            shape="circle" 
+            styleClass="comment-avatar">
+          </p-avatar>
+          <div class="comment-content">
+            <div class="comment-header">
+              <span class="comment-author">{{ comment.userId?.username || 'Anonim' }}</span>
+              <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+            </div>
+            <p class="comment-text">{{ comment.text }}</p>
+            <div class="comment-actions">
+              <button 
+                *ngIf="canDeleteComment(comment)"
+                pButton 
+                label="Sil" 
+                icon="pi pi-trash"
+                class="p-button-text p-button-sm p-button-danger"
+                (click)="deleteComment(comment._id)">
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezon/Bölüm Sidebar (Sadece Diziler İçin) -->
+    <div *ngIf="isSeries && seasonGroups.length > 0" class="episodes-sidebar">
+      <h3 class="sidebar-title">Sezonlar ve Bölümler</h3>
+      <div class="seasons-list">
+        <div *ngFor="let seasonGroup of seasonGroups" class="season-group">
+          <div class="season-header">
+            <h4 class="season-title">Sezon {{ seasonGroup.season }}</h4>
+            <span class="episode-count">{{ seasonGroup.episodes.length }} Bölüm</span>
+          </div>
+          <div class="episodes-list">
+            <div 
+              *ngFor="let ep of seasonGroup.episodes" 
+              class="episode-item"
+              [class.active]="isCurrentEpisode(ep)"
+              (click)="selectEpisode(ep)">
+              <div class="episode-number">{{ ep.episode }}</div>
+              <div class="episode-info">
+                <div class="episode-title">{{ ep.title || 'Bölüm ' + ep.episode }}</div>
+                <div *ngIf="ep.description" class="episode-description">{{ ep.description }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+

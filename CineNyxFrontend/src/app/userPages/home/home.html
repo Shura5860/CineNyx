@@ -1,0 +1,198 @@
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-slider-wrapper">
+            <div class="hero-slides" [style.transform]="'translateX(-' + (activeIndex * 100) + '%)'">
+                <div class="hero-slide" *ngFor="let slide of slides">
+                    <div class="hero-image-wrapper">
+                        <img [src]="slide.image" class="hero-image" [alt]="slide.title" />
+                        <div class="hero-image-overlay"></div>
+                    </div>
+
+                    <!-- MODERN GRADIENT OVERLAY -->
+                    <div class="hero-overlay">
+                        <div class="gradient-mask"></div>
+                    </div>
+
+                    <!-- FİLM BİLGİLERİ -->
+                    <div class="hero-content">
+                        <span class="badge">
+                            <span class="badge-dot"></span>
+                            ÖNE ÇIKANLAR
+                        </span>
+                        <h1 class="hero-title">{{ slide.title }}</h1>
+
+                        <div class="hero-meta">
+                            <span class="meta-item">Film</span>
+                            <span class="meta-separator">|</span>
+                            <span class="meta-item">{{ slide.year }}</span>
+                        </div>
+
+                        <p class="hero-desc">
+                            {{ slide.description }}
+                        </p>
+
+                        <div class="hero-genres">
+                            <span class="genre-label">Genre:</span>
+                            <span class="genre-list">{{ slide.genres.join(', ') }}</span>
+                        </div>
+
+                        <div class="hero-actions">
+                            <button pButton class="p-button-danger hero-btn hero-btn-primary">
+                                <i class="pi pi-play"></i>
+                                <span>Şimdi İzle</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODERN NAVİGASYON BUTONLARI -->
+        <button class="nav-btn nav-btn-prev" (click)="prevSlide()" aria-label="Önceki">
+            <i class="pi pi-chevron-left"></i>
+        </button>
+        <button class="nav-btn nav-btn-next" (click)="nextSlide()" aria-label="Sonraki">
+            <i class="pi pi-chevron-right"></i>
+        </button>
+
+        <!-- PROGRESS INDICATOR -->
+        <div class="hero-progress">
+            <div class="progress-bar" 
+                 [class.animating]="isProgressAnimating"
+                 (animationend)="onProgressComplete()"></div>
+        </div>
+
+        <!-- SLIDE INDICATORS -->
+        <div class="hero-indicators">
+            <button *ngFor="let slide of slides; let i = index" 
+                    [class.active]="i === activeIndex"
+                    (click)="onSlideClick(i)"
+                    class="indicator-dot"
+                    [attr.aria-label]="'Slide ' + (i + 1)">
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- KALDIĞIN YERDEN DEVAM ET -->
+<section class="continue-watching" *ngIf="continueWatching.length > 0">
+    <div class="section-header">
+        <h2 class="section-title">Kaldığın Yerden Devam Et</h2>
+    </div>
+    
+    <div class="card continue-carousel">
+        <p-carousel [value]="continueWatching" [numVisible]="4" [numScroll]="1" [circular]="true"
+            [responsiveOptions]="responsiveOptions">
+            <ng-template let-item #item>
+                <div class="continue-card" (click)="onContinueClick(item)">
+                    <div class="continue-poster-wrapper">
+                        <img [src]="item.poster" [alt]="item.title" class="continue-poster" />
+                        
+                        <!-- PROGRESS BAR -->
+                        <div class="continue-progress-bar">
+                            <div class="progress-fill" [style.width.%]="item.progress"></div>
+                        </div>
+                        
+                        <!-- PLAY BUTTON -->
+                        <div class="continue-play-overlay">
+                            <button pButton icon="pi pi-play" class="p-button-danger continue-play-btn"></button>
+                        </div>
+                        
+                        <!-- TYPE BADGE -->
+                        <div class="continue-type-badge">
+                            <span>{{ item.type === 'film' ? 'Film' : 'Dizi' }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="continue-info">
+                        <h4>{{ item.title }}</h4>
+                        <div class="continue-meta">
+                            <span class="continue-year">{{ item.year }}</span>
+                            <span class="continue-separator">•</span>
+                            <span class="continue-time">{{ item.currentTime }} / {{ item.totalTime }}</span>
+                        </div>
+                        <div class="continue-episode" *ngIf="item.episode">
+                            {{ item.episode }}
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </p-carousel>
+    </div>
+</section>
+
+<!-- YENİ EKLENEN FİLMLER -->
+<section class="lastadded" *ngIf="recentMovies.length > 0">
+    <h2 class="section-title">Yeni Eklenen Filmler</h2>
+    <div class="card lastadded-carousel">
+        <p-carousel [value]="recentMovies" [numVisible]="4" [numScroll]="1" [circular]="true"
+            [responsiveOptions]="responsiveOptions">
+            <ng-template let-film #item>
+                <a [routerLink]="['/film', film.id]" class="film-card-link">
+                    <div class="film-card">
+                        <div class="poster-wrapper">
+                            <img [src]="film.poster" [alt]="film.title" class="poster" (error)="$any($event.target).src=''" />
+                            <div class="imdb">⭐ {{ film.imdb }}</div>
+                            <div class="hover-overlay">
+                                <button pButton icon="pi pi-play" class="p-button-danger play-btn" type="button"></button>
+                            </div>
+                        </div>
+                        <div class="film-info">
+                            <h4>{{ film.title }}</h4>
+                            <span>{{ film.year }} <span *ngIf="film.genres.length">• {{ film.genres.join(', ') }}</span></span>
+                        </div>
+                    </div>
+                </a>
+            </ng-template>
+        </p-carousel>
+    </div>
+</section>
+
+<!-- YENİ EKLENEN DİZİLER -->
+<section class="lastadded" *ngIf="recentSeries.length > 0">
+    <h2 class="section-title">Yeni Eklenen Diziler</h2>
+    <div class="card lastadded-carousel">
+        <p-carousel [value]="recentSeries" [numVisible]="4" [numScroll]="1" [circular]="true"
+            [responsiveOptions]="responsiveOptions">
+            <ng-template let-item #item>
+                <a [routerLink]="['/film', item.id]" class="film-card-link">
+                    <div class="film-card">
+                        <div class="poster-wrapper">
+                            <img [src]="item.poster" [alt]="item.title" class="poster" (error)="$any($event.target).src=''" />
+                            <div class="imdb">⭐ {{ item.imdb }}</div>
+                            <div class="hover-overlay">
+                                <button pButton icon="pi pi-play" class="p-button-danger play-btn" type="button"></button>
+                            </div>
+                        </div>
+                        <div class="film-info">
+                            <h4>{{ item.title }}</h4>
+                            <span>{{ item.year }} <span *ngIf="item.genres.length">• {{ item.genres.join(', ') }}</span></span>
+                        </div>
+                    </div>
+                </a>
+            </ng-template>
+        </p-carousel>
+    </div>
+</section>
+
+<section class="personalmovies">
+    <div class="recommendation-banner">
+        <div class="banner-left">
+            <h2>Sana Özel Öneriler 🎬</h2>
+            <p>
+                İzleme geçmişine göre seçilmiş filmler seni bekliyor.
+                Zevkine güveniyoruz 😉
+            </p>
+
+            <div class="badges">
+                <p-chip label="Yüksek IMDB" />
+                <p-chip label="Trend" />
+                <p-chip label="Senin Türün" />
+            </div>
+        </div>
+
+        <div class="banner-right">
+            <button pButton icon="pi pi-play" label="Önerileri Gör" class="p-button-danger"></button>
+        </div>
+    </div>
+</section>

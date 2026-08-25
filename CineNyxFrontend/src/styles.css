@@ -1,0 +1,45 @@
+@import "primeicons/primeicons.css";
+
+/* ===================== */
+/* 🌞 LIGHT MODE (Default) */
+/* ===================== */
+:root {
+  --primary-color: #E50914;
+  --primary-color-text: #ffffff;
+
+  --surface-ground: #F5F5F7;
+  --surface-section: #FFFFFF;
+  --surface-card: #FFFFFF;
+  --surface-overlay: #FFFFFF;
+  --surface-border: #E0E0E0;
+
+  --text-color: #111111;
+  --text-color-secondary: #555555;
+
+  --highlight-bg: rgba(229, 9, 20, 0.12);
+  --highlight-text-color: #E50914;
+
+  --border-radius: 10px;
+}
+
+/* ===================== */
+/* 🌚 DARK MODE */
+/* ===================== */
+[data-theme="dark"] {
+  --primary-color: #E50914;
+  --primary-color-text: #ffffff;
+
+  --surface-ground: #0A0A0B;
+  --surface-section: #141417;
+  --surface-card: #141417;
+  --surface-overlay: #1C1C1F;
+  --surface-border: rgba(255, 255, 255, 0.06);
+
+  --text-color: #FFFFFF;
+  --text-color-secondary: #A3A3A3;
+
+  --highlight-bg: rgba(229, 9, 20, 0.25);
+  --highlight-text-color: #ffffff;
+
+  --border-radius: 10px;
+}

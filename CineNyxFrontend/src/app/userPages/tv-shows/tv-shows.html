@@ -1,0 +1,130 @@
+<div class="tv-shows-container">
+  <!-- Modern Background Gradient -->
+  <div class="background-gradient"></div>
+
+  <!-- Header Section -->
+  <div class="tv-shows-header">
+    <div class="header-content">
+      <h1 class="page-title">Diziler</h1>
+      <p class="page-subtitle">En popüler ve yeni çıkan dizileri keşfedin</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="tv-shows-content">
+    <!-- Search and Filters Section -->
+    <div class="filters-section">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          placeholder="Dizi ara..."
+          class="search-input"
+        />
+      </div>
+
+      <!-- Genre Filters -->
+      <div class="genre-filters">
+        <button
+          *ngFor="let genre of genres"
+          [class.active]="selectedGenre === genre.value"
+          (click)="selectedGenre = genre.value; onGenreChange()"
+          class="genre-btn"
+        >
+          {{ genre.label }}
+        </button>
+      </div>
+
+      <!-- Advanced Filters -->
+      <div class="advanced-filters">
+        <div class="filter-group">
+          <label>Yıl</label>
+          <select 
+            [(ngModel)]="selectedYear" 
+            (change)="onYearChange()"
+            class="filter-select"
+          >
+            <option [value]="null">Tüm Yıllar</option>
+            <option *ngFor="let year of years" [value]="year.value">{{ year.label }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>IMDB Puanı</label>
+          <select 
+            [(ngModel)]="selectedRating" 
+            (change)="onRatingChange()"
+            class="filter-select"
+          >
+            <option *ngFor="let rating of ratings" [value]="rating.value">{{ rating.label }}</option>
+          </select>
+        </div>
+
+        <button 
+          class="clear-filters-btn"
+          (click)="clearFilters()"
+          *ngIf="selectedGenre !== 'all' || selectedYear || selectedRating || searchQuery"
+        >
+          <i class="pi pi-times"></i>
+          Filtreleri Temizle
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info">
+      <span class="results-count">{{ filteredTvShows.length }} dizi bulundu</span>
+    </div>
+
+    <!-- TV Shows Grid -->
+    <div class="tv-shows-grid-container">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Diziler yükleniyor...</p>
+      </div>
+
+      <div class="tv-shows-grid" *ngIf="!loading && filteredTvShows.length > 0">
+        <div
+          *ngFor="let show of filteredTvShows"
+          class="tv-show-card"
+          [routerLink]="['/film', show.id]"
+        >
+          <div class="tv-show-poster-wrapper">
+            <img [src]="show.poster" [alt]="show.title" class="tv-show-poster" (error)="$any($event.target).src=''" />
+            <div class="tv-show-overlay">
+              <div class="tv-show-rating-badge">
+                <i class="pi pi-star"></i>
+                <span>{{ show.rating.toFixed(1) }}</span>
+              </div>
+              <button class="play-btn">
+                <i class="pi pi-play"></i>
+              </button>
+            </div>
+          </div>
+          <div class="tv-show-info">
+            <h3 class="tv-show-title">{{ show.title }}</h3>
+            <div class="tv-show-meta">
+              <span class="tv-show-year" *ngIf="show.year">{{ show.year }}</span>
+              <span class="tv-show-genre" *ngIf="show.genre && show.genre !== 'all'">{{ show.genre }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && filteredTvShows.length === 0">
+        <i class="pi pi-tv empty-icon"></i>
+        <h3>Dizi bulunamadı</h3>
+        <p>Aradığınız kriterlere uygun dizi bulunamadı. Filtreleri değiştirmeyi deneyin.</p>
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Filtreleri Temizle
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

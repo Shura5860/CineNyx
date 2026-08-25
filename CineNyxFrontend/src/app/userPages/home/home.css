@@ -1,0 +1,922 @@
+.hero {
+    width: 100%;
+    height: 85vh;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 24px 24px;
+    margin-top: -80px;
+    z-index: 999;
+}
+
+.hero-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.hero-slider-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-slides {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.hero-slide {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 1;
+    overflow: hidden;
+    display: block !important;
+}
+
+.hero-slide img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-image-wrapper {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    z-index: 1;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transform: scale(1.1);
+    transition: transform 8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-slide:hover .hero-image {
+    transform: scale(1.05);
+}
+
+.hero-image-overlay {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    background: radial-gradient(circle at 30% 50%, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+    z-index: 2;
+}
+
+/* MODERN GRADIENT OVERLAY */
+.hero-overlay {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.gradient-mask {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 80px);
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.7) 20%,
+        rgba(0, 0, 0, 0.4) 40%,
+        rgba(0, 0, 0, 0.15) 60%,
+        rgba(0, 0, 0, 0.05) 80%,
+        transparent 100%
+    );
+}
+
+.gradient-mask::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        transparent 60%,
+        rgba(0, 0, 0, 0.6) 100%
+    );
+}
+
+/* TEXT ALANI */
+.hero-content {
+    position: absolute !important;
+    z-index: 1003 !important;
+    left: clamp(3rem, 6vw, 6rem) !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    max-width: min(550px, 45vw) !important;
+    color: #fff !important;
+    pointer-events: none;
+    padding-right: 2rem;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-slide .hero-content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-content * {
+    pointer-events: auto;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+.hero-content .hero-actions,
+.hero-content button {
+    pointer-events: auto !important;
+}
+
+.hero-content h1,
+.hero-content .hero-title {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #fff !important;
+}
+
+.hero-content p,
+.hero-content .hero-desc {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.hero-content .badge {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-content .hero-meta,
+.hero-content .hero-genres,
+.hero-content .hero-actions {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-content .hero-genres {
+    display: flex !important;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #E50914;
+    letter-spacing: 3px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+}
+
+.badge-dot {
+    width: 8px;
+    height: 8px;
+    background: #E50914;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 5vw, 4.5rem) !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+    margin: 0 0 1.5rem 0 !important;
+    color: #fff !important;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+    letter-spacing: -0.02em !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.meta-item {
+    display: inline-block;
+}
+
+.meta-separator {
+    opacity: 0.6;
+    font-weight: 300;
+}
+
+.hero-desc {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem) !important;
+    line-height: 1.7 !important;
+    margin: 0 0 1.75rem 0 !important;
+    max-width: 90% !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.hero-genres {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.genre-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+}
+
+.genre-list {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.hero-btn {
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.hero-btn-primary {
+    padding: 0.875rem 2rem;
+    background: #E50914;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(229, 9, 20, 0.4);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hero-btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hero-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(229, 9, 20, 0.5),
+                0 0 0 4px rgba(229, 9, 20, 0.2);
+}
+
+.hero-btn-primary:hover::before {
+    opacity: 1;
+}
+
+.hero-btn-primary:active {
+    transform: translateY(0);
+}
+
+.hero-btn-primary i {
+    font-size: 1.1rem;
+}
+
+.hero-btn-secondary {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.hero-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+/* MODERN NAVİGASYON BUTONLARI */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-size: 1.3rem;
+    opacity: 0.8;
+}
+
+.nav-btn:hover {
+    background: rgba(229, 9, 20, 0.9);
+    border-color: rgba(229, 9, 20, 1);
+    transform: translateY(-50%) scale(1.1);
+    opacity: 1;
+    box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
+}
+
+.nav-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.nav-btn-prev {
+    left: 2rem;
+}
+
+.nav-btn-next {
+    right: 2rem;
+}
+
+/* PROGRESS BAR */
+.hero-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #E50914 0%, #B20710 100%);
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.6);
+    will-change: width;
+}
+
+.progress-bar.animating {
+    animation: progressFill 7s linear forwards;
+    animation-fill-mode: forwards;
+}
+
+.progress-bar:not(.animating) {
+    width: 0% !important;
+    animation: none !important;
+}
+
+@keyframes progressFill {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* SLIDE INDICATORS */
+.hero-indicators {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.75rem;
+    z-index: 100;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.indicator-dot:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.2);
+}
+
+.indicator-dot.active {
+    width: 32px;
+    border-radius: 5px;
+    background: #E50914;
+    border-color: #E50914;
+    box-shadow: 0 0 12px rgba(229, 9, 20, 0.6);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .hero {
+        height: 70vh;
+        min-height: 500px;
+    }
+
+    .hero-content {
+        left: 1.5rem;
+        max-width: calc(100% - 3rem);
+        padding-right: 0;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-desc {
+        font-size: 0.9rem;
+        max-width: 100%;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+
+    .nav-btn-prev {
+        left: 1rem;
+    }
+
+    .nav-btn-next {
+        right: 1rem;
+    }
+
+    .hero-indicators {
+        bottom: 1rem;
+    }
+}
+
+/* Slider animasyonları */
+.hero-slides {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.film-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.film-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface-card);
+    transition: transform 0.25s ease;
+}
+
+.film-card:hover {
+    transform: scale(1.05);
+    z-index: 5;
+}
+
+.poster-wrapper {
+    position: relative;
+}
+
+.poster {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+}
+
+.imdb {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #FFC107;
+    color: #000;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.poster-wrapper:hover .hover-overlay {
+    opacity: 1;
+}
+
+/* Son Eklenenler - film hover'daki Başlat butonu (ana kırmızı) */
+::ng-deep .play-btn,
+::ng-deep .play-btn.p-button,
+::ng-deep .lastadded .play-btn,
+::ng-deep .lastadded .play-btn.p-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    background: #E50914 !important;
+    border-color: #E50914 !important;
+    color: #fff !important;
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+}
+
+::ng-deep .play-btn:hover,
+::ng-deep .play-btn.p-button:hover,
+::ng-deep .lastadded .play-btn:hover {
+    background: #B20710 !important;
+    border-color: #B20710 !important;
+    color: #fff !important;
+}
+
+.film-info {
+    padding: 0.75rem;
+}
+
+.film-info h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.film-info span {
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+}
+
+/* KALDIĞIN YERDEN DEVAM ET */
+.continue-watching {
+    margin-top: 4rem;
+}
+
+.section-header {
+    margin-bottom: 1.5rem;
+}
+
+.continue-carousel {
+    margin-top: 1rem;
+}
+
+.continue-card {
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface-card);
+    transition: transform 0.25s ease;
+}
+
+.continue-card:hover {
+    transform: scale(1.05);
+    z-index: 5;
+}
+
+.continue-poster-wrapper {
+    position: relative;
+}
+
+.continue-poster {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+}
+
+.continue-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.continue-play-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.continue-card:hover .continue-play-overlay {
+    opacity: 1;
+}
+
+/* Kaldığın Yerden Devam Et - film hover'daki Başlat butonu (ana kırmızı) */
+::ng-deep .continue-play-btn,
+::ng-deep .continue-play-btn.p-button,
+::ng-deep .continue-watching .continue-play-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    background: #E50914 !important;
+    border-color: #E50914 !important;
+    color: #fff !important;
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.6);
+}
+
+::ng-deep .continue-play-btn:hover,
+::ng-deep .continue-play-btn.p-button:hover,
+::ng-deep .continue-watching .continue-play-btn:hover {
+    background: #B20710 !important;
+    border-color: #B20710 !important;
+    color: #fff !important;
+}
+
+.continue-type-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.continue-info {
+    padding: 0.75rem;
+}
+
+.continue-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.continue-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.continue-year {
+    font-weight: 500;
+}
+
+.continue-separator {
+    opacity: 0.5;
+}
+
+.continue-time {
+    font-size: 0.75rem;
+}
+
+.continue-episode {
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.lastadded {
+    margin-top: 4rem;
+}
+
+/* Sabit grid boyutu: sayıya göre büyümesin/küçülmesin (tek satır yüksekliği) */
+.lastadded .lastadded-carousel {
+    min-height: 420px;
+    height: 420px;
+}
+
+.lastadded .lastadded-carousel .film-card .poster {
+    height: 320px;
+}
+
+.lastadded .lastadded-carousel .film-card {
+    flex: 0 0 auto;
+}
+
+::ng-deep .lastadded .p-carousel .p-carousel-content {
+    min-height: 420px;
+    height: 420px;
+}
+
+::ng-deep .lastadded .p-carousel .p-carousel-items-container {
+    min-height: 420px;
+}
+
+/* Filmler ve diziler aynı grid boyutu: öğe genişliği sabit (4 görünür = aynı kart boyutu) */
+::ng-deep .lastadded .p-carousel .p-carousel-item {
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding: 0 0.75rem;
+}
+
+::ng-deep .lastadded .p-carousel .p-carousel-item .film-card {
+    width: 100%;
+    max-width: 100%;
+}
+
+::ng-deep .lastadded .p-carousel .p-carousel-item .poster-wrapper,
+::ng-deep .lastadded .p-carousel .p-carousel-item .poster {
+    width: 100%;
+}
+
+@media (max-width: 1400px) {
+    ::ng-deep .lastadded .p-carousel .p-carousel-item {
+        flex: 0 0 33.333%;
+        max-width: 33.333%;
+    }
+}
+
+@media (max-width: 1024px) {
+    ::ng-deep .lastadded .p-carousel .p-carousel-item {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    ::ng-deep .lastadded .p-carousel .p-carousel-item {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.section-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    background: var(--primary-color);
+    border-radius: 999px;
+}
+
+::ng-deep .p-carousel-item {
+    padding: 0 0.75rem;
+}
+
+.recommendation-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2.5rem 3rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg,
+            #141417 0%,
+            #0A0A0B 60%);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    margin: 4rem 0;
+}
+
+.banner-left h2 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.banner-left p {
+    margin: 0.75rem 0 1.25rem;
+    color: #A3A3A3;
+    max-width: 520px;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+::ng-deep .p-chip {
+    background: rgba(229, 9, 20, 0.15);
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+
+/* Önerileri Gör butonu - sitenin ana kırmızısı */
+::ng-deep .banner-right .p-button,
+::ng-deep .recommendation-banner .banner-right .p-button {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    background: #E50914 !important;
+    border-color: #E50914 !important;
+    color: #fff !important;
+    box-shadow: 0 0 25px rgba(229, 9, 20, 0.5);
+}
+
+::ng-deep .banner-right .p-button:hover,
+::ng-deep .recommendation-banner .banner-right .p-button:hover {
+    background: #B20710 !important;
+    border-color: #B20710 !important;
+    color: #fff !important;
+}
+
+.personalmovies {
+    padding: 0 3rem;
+}

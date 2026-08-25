@@ -1,0 +1,236 @@
+<div class="admin-tv-shows-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dizi Yönetimi</h1>
+      <p class="page-subtitle">Dizileri görüntüleyin, ekleyin veya silin</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        pButton 
+        label="Yeni Dizi Ekle" 
+        icon="pi pi-plus" 
+        class="p-button-primary"
+        (click)="openNew()">
+      </button>
+      <button 
+        *ngIf="selectedTvShows.length > 0"
+        pButton 
+        label="Seçilenleri Sil" 
+        icon="pi pi-trash" 
+        class="p-button-danger"
+        (click)="deleteSelectedTvShows()">
+      </button>
+    </div>
+  </div>
+
+  <!-- Dizi Tablosu -->
+  <p-card>
+    <p-table 
+      [value]="filteredTvShows" 
+      [paginator]="true"
+      [rows]="itemsPerPage"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [first]="first"
+      (page)="onPageChange($event)"
+      [globalFilterFields]="['title', 'genre']"
+      [tableStyle]="{'min-width': '50rem'}"
+      styleClass="p-datatable-striped"
+      [loading]="false"
+      selectionMode="multiple"
+      [(selection)]="selectedTvShows"
+      dataKey="_id">
+      
+      <ng-template pTemplate="caption">
+        <div class="table-header">
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input 
+              pInputText 
+              type="text" 
+              [(ngModel)]="searchQuery"
+              (input)="onSearch()"
+              placeholder="Dizi ara..." />
+          </span>
+          <p-select 
+            [options]="sortOptions" 
+            [(ngModel)]="sortOption"
+            (onChange)="onSortChange()"
+            placeholder="İstatistiğe göre sırala"
+            [showClear]="true"
+            class="sort-dropdown">
+          </p-select>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th style="width: 80px">Poster</th>
+          <th>Başlık</th>
+          <th style="width: 80px">Yıl</th>
+          <th style="width: 120px">Tür</th>
+          <th style="width: 100px">Durum</th>
+          <th style="width: 120px">Toplam İzlenme</th>
+          <th style="width: 100px">Beğenme</th>
+          <th style="width: 100px">Beğenmeme</th>
+          <th style="width: 100px;">Dosya İşlemleri</th>
+          <th style="width: 120px">İşlemler</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-tvShow>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="tvShow"></p-tableCheckbox>
+          </td>
+          <td>
+            <img 
+              [src]="tvShow.imagePath || tvShow.poster" 
+              [alt]="tvShow.title" 
+              class="table-poster"
+              (error)="$event.target.src=''" />
+          </td>
+          <td>
+            <strong>{{ tvShow.title }}</strong>
+          </td>
+          <td>{{ getYear(tvShow.releaseDate) }}</td>
+          <td>
+            <span *ngIf="!tvShow.categories?.length">-</span>
+            <span *ngFor="let genre of tvShow.categories" class="genre-badge-wrap">
+              <p-tag [value]="genre.name" [severity]="getSeverity(genre.name)"></p-tag>
+            </span>
+          </td>
+          <td>
+            <span *ngIf="tvShow.movieStatus === 0" class="genre-badge-wrap">
+              <p-tag [value]="'Dizi Oluşturuldu Ama İçerik Yüklenmedi'" severity="warn" [rounded]="true"></p-tag>
+            </span>
+            <span *ngIf="tvShow.movieStatus === 1" class="genre-badge-wrap">
+              <p-tag [value]="'İçerik Yüklendi Ama Yayında Değil'" severity="info" [rounded]="true"></p-tag>
+            </span>
+            <span *ngIf="tvShow.movieStatus === 2" class="genre-badge-wrap">
+              <p-tag [value]="'Yayında'" severity="success" [rounded]="true"></p-tag>
+            </span>
+          </td>
+          <td>
+            <span class="stat-value">{{ formatNumber(tvShow.watchCount ?? 0) }}</span>
+          </td>
+          <td>
+            <span class="stat-value positive">{{ formatNumber(tvShow.likeCount ?? 0) }}</span>
+          </td>
+          <td>
+            <span class="stat-value negative">{{ formatNumber(tvShow.dislikeCount ?? 0) }}</span>
+          </td> 
+          <td>
+            <div class="card flex justify-center">
+              <p-button label="Dosya Yöneticisini Aç" (onClick)="openFileManager(tvShow)"/>
+            </div>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                pButton 
+                icon="pi pi-pencil" 
+                class="p-button-rounded p-button-text p-button-sm"
+                (click)="editTvShow(tvShow)"
+                pTooltip="Düzenle">
+              </button>
+              <button 
+                pButton 
+                icon="pi pi-trash" 
+                class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                (click)="deleteTvShow(tvShow)"
+                pTooltip="Sil">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10">
+            <div class="empty-state">
+              <i class="pi pi-tv"></i>
+              <p>Henüz dizi eklenmemiş</p>
+              <button 
+                pButton 
+                label="İlk Diziyi Ekle" 
+                icon="pi pi-plus" 
+                class="p-button-primary"
+                (click)="openNew()">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Dizi Ekleme/Düzenleme Dialog -->
+  <p-dialog 
+    [(visible)]="displayDialog" 
+    [header]="editingTvShow ? 'Dizi Düzenle' : 'Yeni Dizi Ekle'"
+    [modal]="true"
+    [style]="{width: '500px'}"
+    [draggable]="false"
+    [resizable]="false">
+
+    <!-- DÜZENLEME MODU -->
+    <div *ngIf="editingTvShow" class="dialog-content">
+      <div class="form-group">
+        <label for="editTitle">Başlık *</label>
+        <input id="editTitle" type="text" pInputText [(ngModel)]="newTvShow.title" placeholder="Dizi adı" class="w-full" />
+      </div>
+      <div class="form-group">
+        <label for="editDesc">Açıklama</label>
+        <textarea id="editDesc" pInputText [(ngModel)]="newTvShow.description" placeholder="Dizi açıklaması" class="w-full" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="editShortDesc">Kısa Açıklama</label>
+        <input id="editShortDesc" type="text" pInputText [(ngModel)]="newTvShow.shortDescription" placeholder="Kısa açıklama" class="w-full" />
+      </div>
+      <div class="form-group">
+        <label for="editImdb">IMDB Puanı</label>
+        <p-inputNumber id="editImdb" [(ngModel)]="newTvShow.imdbScore" [min]="0" [max]="10" [minFractionDigits]="1" [maxFractionDigits]="1" class="w-full"></p-inputNumber>
+      </div>
+      <div class="form-group">
+        <label for="editQuality">Maksimum Kalite</label>
+        <p-select id="editQuality" [options]="[{label: 'SD', value: 'SD'}, {label: 'HD', value: 'HD'}, {label: 'Full HD', value: 'FullHD'}, {label: '4K', value: '4K'}]" [(ngModel)]="newTvShow.maxQuality" placeholder="Kalite seçin" class="w-full"></p-select>
+      </div>
+      <div class="flex justify-end gap-2 mt-3">
+        <p-button label="İptal" icon="pi pi-times" styleClass="p-button-text" (onClick)="displayDialog = false" />
+        <p-button label="Kaydet" icon="pi pi-check" (onClick)="saveTvShow()" />
+      </div>
+    </div>
+
+    <!-- YENİ EKLEME MODU -->
+    <div *ngIf="!editingTvShow" class="dialog-content">
+      <div class="form-group">
+        <label for="title">Dizi İsmi *</label>
+        <input id="title" type="text" pInputText [(ngModel)]="newTvShow.title" placeholder="Dizi adını girin"
+          class="w-full" />
+      </div>
+      <p-button label="Diziyi Ara" icon="pi pi-search" (click)="searchTvShow()" />
+    </div>
+
+    <div *ngIf="!editingTvShow && newTvShow.searchResults && newTvShow.searchResults.length > 0" class="movies-card-list">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xl font-bold">Diziler</span>
+        <span>Toplam {{ newTvShow.searchResults.length }} dizi bulundu.</span>
+      </div>
+      <div class="movie-cards-grid">
+        <div *ngFor="let show of newTvShow.searchResults" class="movie-card cursor-pointer hover:shadow-lg transition"
+          (click)="selectTvShow(show)">
+          <img [src]="show.poster" [alt]="show.title" class="movie-card-poster rounded mb-2"
+            style="object-fit:cover;width:100%;height:220px;" />
+          <div class="movie-card-title" [title]="show.title">{{ show.title }}</div>
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+</div>

@@ -1,0 +1,255 @@
+<div class="admin-users-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">
+        {{ selectedRole === 'admin' ? 'Admin Kullanıcıları' : selectedRole === 'user' ? 'Üye Kullanıcıları' : 'Kullanıcı Yönetimi' }}
+      </h1>
+      <p class="page-subtitle">
+        {{ selectedRole === 'admin' ? 'Admin yetkisine sahip kullanıcıları görüntüleyin ve yönetin' : selectedRole === 'user' ? 'Siteye kayıtlı üyeleri görüntüleyin ve yönetin' : 'Siteye kayıtlı kullanıcıları görüntüleyin ve yönetin' }}
+      </p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-chip">
+        <i class="pi pi-users"></i>
+        <span>{{ totalCount }} Toplam</span>
+      </div>
+      <div class="stat-chip admin-chip">
+        <i class="pi pi-shield"></i>
+        <span>{{ adminCount }} Admin</span>
+      </div>
+      <div class="stat-chip user-chip">
+        <i class="pi pi-user"></i>
+        <span>{{ userCount }} Üye</span>
+      </div>
+      <div class="stat-chip blocked-chip" *ngIf="blockedCount > 0">
+        <i class="pi pi-ban"></i>
+        <span>{{ blockedCount }} Engelli</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Filtre Butonları -->
+  <div class="role-filters">
+    <button 
+      pButton 
+      label="Tümü" 
+      [class]="selectedRole === 'all' ? 'p-button-primary' : 'p-button-secondary'"
+      (click)="filterByRole('all')">
+    </button>
+    <button 
+      pButton 
+      label="Admin" 
+      icon="pi pi-shield"
+      [class]="selectedRole === 'admin' ? 'p-button-primary' : 'p-button-secondary'"
+      (click)="filterByRole('admin')">
+    </button>
+    <button 
+      pButton 
+      label="Moderatör" 
+      icon="pi pi-star"
+      [class]="selectedRole === 'moderator' ? 'p-button-primary' : 'p-button-secondary'"
+      (click)="filterByRole('moderator')">
+    </button>
+    <button 
+      pButton 
+      label="Üye" 
+      icon="pi pi-user"
+      [class]="selectedRole === 'user' ? 'p-button-primary' : 'p-button-secondary'"
+      (click)="filterByRole('user')">
+    </button>
+  </div>
+
+  <p-card>
+    <!-- Arama -->
+    <div class="search-section">
+      <span class="p-input-icon-left search-input-wrapper">
+        <i class="pi pi-search"></i>
+        <input 
+          pInputText 
+          type="text" 
+          placeholder="Kullanıcı ara (kullanıcı adı, email)..." 
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          class="search-input" />
+      </span>
+    </div>
+
+    <!-- Kullanıcı Kartları Grid -->
+    <div class="users-grid" *ngIf="users.length > 0">
+      <div 
+        *ngFor="let user of users" 
+        class="user-card"
+        [class.blocked]="user.blocked">
+        <div class="card-actions-top">
+          <button 
+            pButton 
+            icon="pi pi-pencil"
+            class="p-button-rounded card-action-btn"
+            (click)="openEditDialog(user); $event.stopPropagation()"
+            pTooltip="Düzenle">
+          </button>
+          <button 
+            pButton 
+            [icon]="user.blocked ? 'pi pi-check' : 'pi pi-ban'"
+            [class]="user.blocked ? 'p-button-rounded card-action-btn' : 'p-button-rounded card-action-btn p-button-warning'"
+            (click)="toggleBlock(user); $event.stopPropagation()"
+            [pTooltip]="user.blocked ? 'Engeli Kaldır' : 'Engelle'">
+          </button>
+          <button 
+            pButton 
+            icon="pi pi-trash" 
+            class="p-button-rounded card-action-btn p-button-danger"
+            (click)="confirmDelete(user); $event.stopPropagation()"
+            pTooltip="Sil">
+          </button>
+        </div>
+        <div class="user-avatar-section">
+          <p-avatar 
+            [image]="user.profileImage || ''" 
+            [label]="!user.profileImage ? getInitial(user) : undefined"
+            shape="circle" 
+            size="large"
+            styleClass="user-avatar">
+          </p-avatar>
+          <p-tag 
+            [value]="getRoleLabel(user.role)" 
+            [severity]="getRoleSeverity(user.role)"
+            class="role-badge">
+          </p-tag>
+        </div>
+        <div class="user-info">
+          <h3 class="user-name">&#64;{{ user.username }}</h3>
+          <p class="user-email">{{ user.email }}</p>
+          <div class="user-meta">
+            <div class="meta-item">
+              <i class="pi pi-calendar"></i>
+              <span>Kayıt: {{ formatDate(user.createdAt) }}</span>
+            </div>
+          </div>
+          <p-tag 
+            [value]="user.blocked ? 'Engelli' : 'Aktif'" 
+            [severity]="getBlockSeverity(user.blocked)"
+            class="status-badge">
+          </p-tag>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="empty-state" *ngIf="loading">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+      <p>Yükleniyor...</p>
+    </div>
+
+    <!-- Boş Durum -->
+    <div class="empty-state" *ngIf="!loading && users.length === 0">
+      <i class="pi pi-users"></i>
+      <p>Kullanıcı bulunamadı</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="totalUsers > itemsPerPage">
+      <p-paginator 
+        [rows]="itemsPerPage" 
+        [totalRecords]="totalUsers"
+        [rowsPerPageOptions]="[12, 24, 48]"
+        (onPageChange)="onPageChange($event)"
+        [first]="first">
+      </p-paginator>
+    </div>
+  </p-card>
+
+  <!-- Kullanıcı Düzenleme Dialog -->
+  <p-dialog 
+    header="Kullanıcı Düzenle" 
+    [(visible)]="showEditDialog" 
+    [modal]="true" 
+    [style]="{width: '500px'}"
+    [draggable]="false"
+    [closable]="!saving">
+    <div class="edit-dialog-content" *ngIf="editTarget">
+      <!-- Kullanıcı Adı -->
+      <div class="edit-field">
+        <label for="editUsername">Kullanıcı Adı</label>
+        <input 
+          id="editUsername"
+          pInputText 
+          type="text" 
+          [(ngModel)]="editForm.username"
+          class="edit-input" />
+      </div>
+
+      <!-- E-posta -->
+      <div class="edit-field">
+        <label for="editEmail">E-posta</label>
+        <input 
+          id="editEmail"
+          pInputText 
+          type="email" 
+          [(ngModel)]="editForm.email"
+          class="edit-input" />
+      </div>
+
+      <!-- Rol -->
+      <div class="edit-field">
+        <label>Rol</label>
+        <div class="role-radio-group">
+          <div class="role-radio-item">
+            <p-radioButton 
+              name="editRole" 
+              value="user" 
+              [(ngModel)]="editForm.role"
+              inputId="roleUser">
+            </p-radioButton>
+            <label for="roleUser" class="role-radio-label">
+              <i class="pi pi-user"></i>
+              Kullanıcı
+            </label>
+          </div>
+          <div class="role-radio-item">
+            <p-radioButton 
+              name="editRole" 
+              value="moderator" 
+              [(ngModel)]="editForm.role"
+              inputId="roleModerator">
+            </p-radioButton>
+            <label for="roleModerator" class="role-radio-label">
+              <i class="pi pi-star"></i>
+              Moderatör
+            </label>
+          </div>
+          <div class="role-radio-item">
+            <p-radioButton 
+              name="editRole" 
+              value="admin" 
+              [(ngModel)]="editForm.role"
+              inputId="roleAdmin">
+            </p-radioButton>
+            <label for="roleAdmin" class="role-radio-label">
+              <i class="pi pi-shield"></i>
+              Admin
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Engel Durumu -->
+      <div class="edit-field">
+        <label>Hesap Durumu</label>
+        <div class="block-toggle">
+          <p-toggleSwitch [(ngModel)]="editForm.blocked"></p-toggleSwitch>
+          <span [class]="editForm.blocked ? 'block-label blocked' : 'block-label active'">
+            {{ editForm.blocked ? 'Engelli' : 'Aktif' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    <ng-template #footer>
+      <button pButton label="İptal" icon="pi pi-times" class="p-button-text" (click)="showEditDialog = false" [disabled]="saving"></button>
+      <button pButton label="Kaydet" icon="pi pi-check" (click)="saveEdit()" [loading]="saving"></button>
+    </ng-template>
+  </p-dialog>
+
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+</div>
